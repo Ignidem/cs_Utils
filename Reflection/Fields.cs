@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Utilities.Reflection
 {
-    public static class Fields
+	public static class Fields
     {
         private static readonly Dictionary<Type, FieldInfo[]> fieldsByType = new Dictionary<Type, FieldInfo[]>();
 
@@ -17,7 +15,7 @@ namespace Utilities.Reflection
             //Get the type from the fieldInfo
             //this fieldInfo is already given to you by PropertyDrawer
             //Type type = fieldInfo.FieldType;
-            if (!serializedFields.TryGetValue(targetType, out FieldInfo[] fields))
+            if (!serializedFields.TryGetValue(targetType, out FieldInfo[]? fields))
             {
                 //if you don't already have the fields, go get them
                 fields = targetType.GetFields(bindingFlags);
