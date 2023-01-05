@@ -19,7 +19,7 @@
             var assembly = type.Assembly;
             return assembly.GetTypes().Where(t =>
                 !t.IsInterface && !t.IsAbstract
-                && (t == type || t.Implements(type)));
+                && (t == type || t.Inherits(type)));
         }
     }
 }
