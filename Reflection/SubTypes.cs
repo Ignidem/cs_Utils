@@ -1,10 +1,14 @@
-﻿namespace Utilities.Reflection
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Utilities.Reflection
 {
 	public static class SubTypes
     {
         private static readonly Dictionary<Type, Type[]> subTypes = new Dictionary<Type, Type[]>();
 
-        public static Type[] GetsubTypes(this Type type)
+        public static Type[] GetSubTypes(this Type type)
         {
             if (subTypes.TryGetValue(type, out Type[]? types)) 
                 return types;
