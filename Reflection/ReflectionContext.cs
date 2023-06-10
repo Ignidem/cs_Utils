@@ -72,6 +72,8 @@ namespace Utilities.Reflection
 			return new ReflectionContext(target, context, member);
 		}
 
+		public string? OriginName => origin?.MemberInfo?.Name;
+
 		public readonly object? target;
 
 		public readonly Type type;
