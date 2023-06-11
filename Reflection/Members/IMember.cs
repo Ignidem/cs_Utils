@@ -2,6 +2,7 @@
 
 namespace Utilities.Reflection.Members
 {
+#nullable enable
 	public interface IMember
 	{
 		MemberTypes MemberType { get; }

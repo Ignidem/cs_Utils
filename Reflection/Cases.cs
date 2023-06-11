@@ -1,5 +1,9 @@
-﻿namespace Utilities.Reflection
+﻿using System;
+using System.Collections.Generic;
+
+namespace Utilities.Reflection
 {
+#nullable enable
 	public class TypeCases<TValue> : Cases<Type, TValue>
 	{
 		public TypeCases<TValue> Set<T>(Value value)
@@ -55,6 +59,9 @@
 		{
 			get
 			{
+				if (key is null)
+					throw new KeyNotFoundException();
+
 				if (_values.TryGetValue(key, out Value value))
 					return value.Get(key);
 

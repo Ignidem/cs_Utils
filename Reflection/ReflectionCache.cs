@@ -1,9 +1,13 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Utilities.Conversions;
 using Utilities.Reflection.Members;
 
 namespace Utilities.Reflection
 {
+#nullable enable
 	public class ReflectionCache<T> : ReflectionCache where T : class
 	{
 		private readonly Dictionary<string, Member> instanceMembers;

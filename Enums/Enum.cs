@@ -1,7 +1,10 @@
-﻿using Utilities.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using Utilities.Extensions;
 
 namespace Utilities.Enums
 {
+#nullable enable
 	public class Enum<T> where T : Enum
 	{
 		public static T? Random(Random random)
@@ -35,7 +38,7 @@ namespace Utilities.Enums
 			return (t = default!) != null;
 		}
 
-		public T Value { get; set; }
+		public T Value { get; set; } = default!;
 	}
 
 	public static class EnumParser

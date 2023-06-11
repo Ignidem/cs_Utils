@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Utilities.Reflection.Members;
 
 namespace Utilities.Reflection
 {
+#nullable enable
 	public class ReflectionContext
 	{
 		private static readonly Regex IndexerRegex = new(@"\[[0-9]+\]$");

@@ -1,7 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Utilities.Collections
 {
+#nullable enable
 	public static class ArrayEx
 	{
 		public static int IndexOf<T>(this T[] array, Predicate<T> predicate)

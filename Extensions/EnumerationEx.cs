@@ -1,5 +1,10 @@
-﻿namespace Utilities.Extensions
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Utilities.Extensions
 {
+#nullable enable
 	public static class EnumerationEx
 	{
 		private static Random rand = new(Guid.NewGuid().GetHashCode());

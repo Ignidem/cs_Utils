@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Utilities.Reflection
 {
+#nullable enable
 	public static class SubTypes
     {
         private static readonly Dictionary<Type, Type[]> subTypes = new Dictionary<Type, Type[]>();

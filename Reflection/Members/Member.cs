@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Utilities.Conversions;
 
 namespace Utilities.Reflection.Members
 {
+#nullable enable
 	public sealed class Member : IMember
 	{
 		#region To Member

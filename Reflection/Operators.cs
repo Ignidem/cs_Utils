@@ -1,7 +1,9 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace IBS_Web.External.CS.Utils.Reflection
 {
+#nullable enable
 	public static class Operators
 	{
 		public static class Names
