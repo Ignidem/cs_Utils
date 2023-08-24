@@ -21,7 +21,7 @@ namespace Utilities.Reflection
 
         public static IEnumerable<Type> GetImplements(this Type type)
         {
-            var assembly = type.Assembly;
+			System.Reflection.Assembly assembly = type.Assembly;
             return assembly.GetTypes().Where(t =>
                 !t.IsInterface && !t.IsAbstract
                 && (t == type || t.Inherits(type)));
