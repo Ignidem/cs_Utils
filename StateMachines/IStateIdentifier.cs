@@ -1,4 +1,4 @@
-﻿namespace Assets.External.Utils.StateMachines
+﻿namespace Utils.StateMachines
 {
 	public interface IStateData<T>
 	{

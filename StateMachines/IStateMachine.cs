@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Assets.External.Utils.StateMachines
+namespace Utils.StateMachines
 {
 	public delegate void StateChangeDelegate<K>(IState<K> current, IState<K> next);
 	
@@ -44,14 +44,19 @@ namespace Assets.External.Utils.StateMachines
 
 		private async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
-			if (ActiveState != null)
-				await ActiveState.Exit();
+			await state.Preload(data);
 
-			OnStateChange(ActiveState, state);
+			IState<K> oldState = ActiveState;
+			if (oldState != null)
+				await oldState.Exit();
 
 			ActiveState = state;
+			await ActiveState.Enter(this);
 
-			await ActiveState.Enter(data);
+			if (oldState != null)
+				await oldState?.Cleanup();
+
+			OnStateChange(ActiveState, state);
 		}
 	}
 }
