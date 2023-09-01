@@ -10,27 +10,65 @@ namespace Utils.EventSystem
 
     public class EventHandler<TKey> : IEventHandler
 	{
-        readonly Dictionary<TKey, IEventContainer> eventsContainers = new Dictionary<TKey, IEventContainer>();
+        private readonly Dictionary<TKey, IEventContainer> eventsContainers
+			= new Dictionary<TKey, IEventContainer>();
 
-        public void Invoke<TSource, TArgument>(TKey key, TSource source, TArgument arg)
+		#region Action
+		public void Invoke(TKey key)
+		{
+			EventContainer container = Get<EventContainer>(key);
+			container?.InvokeEvent();
+		}
+		public void Add(TKey key, EventContainer.EventDelegate func)
+		{
+			EventContainer container = Get<EventContainer>(key);
+			container?.Add(func);
+		}
+		public void Remove(TKey key, EventContainer.EventDelegate func)
+		{
+			EventContainer container = Get<EventContainer>(key);
+			container?.Remove(func);
+		}
+		#endregion
+
+		#region Action In
+		public void Invoke<T>(TKey key, T arg)
+		{
+			EventContainer<T> container = Get<EventContainer<T>>(key);
+			container?.InvokeEvent(arg);
+		}
+		public void Add<T>(TKey key, EventContainer<T>.EventDelegate func)
+		{
+			EventContainer<T> container = Get<EventContainer<T>>(key);
+			container?.Add(func);
+		}
+		public void Remove<T>(TKey key, EventContainer<T>.EventDelegate func)
+		{
+			EventContainer<T> container = Get<EventContainer<T>>(key);
+			container?.Remove(func);
+		}
+		#endregion
+
+		#region Func in out
+		public TReturn Invoke<TReturn, TArgument>(TKey key, TArgument arg)
         {
-            EventContainer<TSource, TArgument> container = Get<TSource, TArgument>(key);
-            container?.InvokeEvent(source, arg);
+            EventContainer<TReturn, TArgument> container = Get<EventContainer<TReturn, TArgument>>(key);
+            return container == null ? default : container.InvokeEvent(arg);
+        }
+		public void Add<TSource, TArgument>(TKey key, EventContainer<TSource, TArgument>.EventDelegate func)
+        {
+			EventContainer<TSource, TArgument> container = Get<EventContainer<TSource, TArgument>>(key);
+			container?.Add(func);
         }
 
-        public void Subscribe<TSource, TArgument>(TKey key, EventContainer<TSource, TArgument>.EventHandler func)
+        public void Remove<TSource, TArgument>(TKey key, EventContainer<TSource, TArgument>.EventDelegate func)
         {
-            EventContainer<TSource, TArgument> container = Get<TSource, TArgument>(key);
-            container?.Add(func);
-        }
-
-        public void UnSubscribe<TSource, TArgument>(TKey key, EventContainer<TSource, TArgument>.EventHandler func)
-        {
-            EventContainer<TSource, TArgument> container = Get<TSource, TArgument>(key);
+            EventContainer<TSource, TArgument> container = Get<EventContainer<TSource, TArgument>>(key);
             container?.Remove(func);
         }
+		#endregion
 
-        public void CleanInstace(object target)
+		public void CleanInstace(object target)
         {
             foreach (KeyValuePair<TKey, IEventContainer> keypair in eventsContainers)
             {
@@ -38,20 +76,22 @@ namespace Utils.EventSystem
             }
         }
 
-        private EventContainer<TSource, TArgument> Get<TSource, TArgument>(TKey key)
-        {
+        private T Get<T>(TKey key) 
+			where T : IEventContainer, new()
+		{
             if (!eventsContainers.TryGetValue(key, out IEventContainer container))
             {
-                container = new EventContainer<TSource, TArgument>();
+                container = new T();
                 eventsContainers.Add(key, container);
             }
 
-            if (container is EventContainer<TSource, TArgument> eventContainer)
+            if (container is T eventContainer)
                 return eventContainer;
 
-            Debug.LogError($"Event Container \n {container.GetType()} \n at Key {key} \n does not match types" +
-                $"\n {typeof(TSource)} \n {typeof(TArgument)}");
-            return null;
+			const string messageFormat = "Event Container \n {0} \n at Key {1} \n does not match types \n {2}";
+			string message = string.Join(messageFormat, container.GetType(), key, typeof(T));
+
+			throw new System.Exception(message);
         }
     }
 }
