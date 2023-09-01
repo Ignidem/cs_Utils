@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Utils.StateMachines
 {
@@ -23,31 +24,36 @@ namespace Utils.StateMachines
 
 		private IStateMachine<K> _activeStateMachine;
 
-		public abstract Task Preload(IStateData<K> data);
-		public virtual Task Enter(IStateMachine<K> stateMachine) 
+		public Task Preload(IStateData<K> data) => OnPreload(data);
+		protected virtual Task OnPreload(IStateData<K> data) => Task.CompletedTask;
+
+		public Task Enter(IStateMachine<K> stateMachine) 
 		{
 			IsActive = true;
 
 			if (_activeStateMachine != stateMachine && _activeStateMachine != null)
 			{
-				throw new System.Exception(string.Format("State {0}<{1}> is already active in another state machine {2}",
+				throw new Exception(string.Format("State {0}<{1}> is already active in another state machine {2}",
 					GetType().Name, Key, _activeStateMachine.GetType().Name));
 			}
 
 			_activeStateMachine = stateMachine;
 
-			return Task.CompletedTask;
+			return OnEnter();
 		}
+		protected virtual Task OnEnter() => Task.CompletedTask;
 
-		public virtual Task Exit()
+		public Task Exit()
 		{
 			IsActive = false;
 			_activeStateMachine = null;
 
-			return Task.CompletedTask;
+			return OnExit();
 		}
+		protected virtual Task OnExit() => Task.CompletedTask;
 
-		public abstract Task Cleanup();
+		public Task Cleanup() => OnCleanup();
+		protected virtual Task OnCleanup() => Task.CompletedTask;
 
 		protected Task SwitchState(IStateData<K> data)
 		{

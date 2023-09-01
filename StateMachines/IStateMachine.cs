@@ -1,62 +1,38 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Utils.StateMachines
 {
 	public delegate void StateChangeDelegate<K>(IState<K> current, IState<K> next);
+	public delegate void ExceptionHandlerDelegate(Exception exception);
 	
-	public interface IStateMachine { }
+	public interface IStateMachine 
+	{
+		IState ActiveState { get; }
+		event ExceptionHandlerDelegate OnException;
+		Task ExitActiveState();
+	}
 
 	public interface IStateMachine<K> : IStateMachine
-	{ 
-		IState ActiveState { get; }
+	{
+		new IState<K> ActiveState { get; }
 		event StateChangeDelegate<K> OnStateChange;
-
 		Task SwitchState(IStateData<K> data);
 		Task SwitchState(K key);
 	}
-
-	public class StateMachine<K> : IStateMachine<K>
+	
+	public static class StateMachineEx
 	{
-		public IState<K> ActiveState { get; protected set; }
-		IState IStateMachine<K>.ActiveState => ActiveState;
-		protected Dictionary<K, IState<K>> States;
-		public event StateChangeDelegate<K> OnStateChange;
-
-		public StateMachine(IEnumerable<IState<K>> states)
+		public static bool TryActiveStateAs<T>(this IStateMachine stateMachine, out T state)
+			where T : IState
 		{
-			States = states.ToDictionary(state => state.Key, state => state);
-		}
-
-		public async Task SwitchState(IStateData<K> data)
-		{
-			K key = data.Key;
-			if (States.TryGetValue(key, out IState<K> state))
-				await SwitchState(state, data);
-		}
-
-		public async Task SwitchState(K key)
-		{
-			if (States.TryGetValue(key, out IState<K> state))
-				await SwitchState(state, null);
-		}
-
-		private async Task SwitchState(IState<K> state, IStateData<K> data)
-		{
-			await state.Preload(data);
-
-			IState<K> oldState = ActiveState;
-			if (oldState != null)
-				await oldState.Exit();
-
-			ActiveState = state;
-			await ActiveState.Enter(this);
-
-			if (oldState != null)
-				await oldState?.Cleanup();
-
-			OnStateChange(ActiveState, state);
+			if (stateMachine.ActiveState is T tState)
+			{
+				state = tState;
+				return true;
+			}
+			state = default;
+			return false;
 		}
 	}
 }
