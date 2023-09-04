@@ -36,7 +36,7 @@ namespace Utilities.Conversions
 			return false;
 		}
 
-		public static bool TryConvertTo<T>(this object obj, out T result)
+		public static bool TryConvertTo<T>(this object? obj, out T result)
 		{
 			if (obj == null)
 			{
@@ -73,7 +73,7 @@ namespace Utilities.Conversions
 			return false;
 		}
 
-		public static T ConvertTo<T>(this object obj)
+		public static T ConvertTo<T>(this object? obj)
 		{
 			return TryConvertTo(obj, out T result) ? result : default!;
 		}
