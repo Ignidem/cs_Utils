@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace IBS_Web.External.CS.Utils.Reflection
+namespace Utils.Reflection
 {
 #nullable enable
 	public static class Operators

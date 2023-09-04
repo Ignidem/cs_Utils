@@ -1,34 +1,81 @@
-﻿using IBS_Web.External.CS.Utils.Reflection;
+﻿using Utils.Reflection;
 using System;
 using System.Reflection;
 using Utilities.Reflection;
+using Newtonsoft.Json;
 
 namespace Utilities.Conversions
 {
 #nullable enable
 	public static class ConvertibleUtils
 	{
-		public static T? ConvertTo<T>(this object? obj)
+		public static bool TryToJson<T>(this T instance, out string json)
 		{
-			if (obj == null) return default;
-
-			if (obj is T r) return r;
-
-			if (obj is IConvertible<T> convertible)
-				return convertible.Convert();
-
 			try
 			{
-				return (T)obj;
-			} 
-			catch (Exception) { }
+				json = JsonConvert.SerializeObject(instance);
+				return true;
+			}
+			catch(Exception) 
+			{
+				json = null!;
+				return false;
+			}
+		}
+
+		public static bool TryParseJson<T>(this string json, out T result)
+		{
 			try
 			{
-				return (T)Convert.ChangeType(obj, typeof(T));
+				result = JsonConvert.DeserializeObject<T>(json)!;
+				return true;
 			}
 			catch (Exception) { }
-			
-			return default;
+
+			result = default!;
+			return false;
+		}
+
+		public static bool TryConvertTo<T>(this object obj, out T result)
+		{
+			if (obj == null)
+			{
+				result = default!;
+				return false;
+			}
+
+			if (obj is T r)
+			{
+				result = r;
+				return true;
+			}
+
+			if (obj is IConvertible<T> convertible)
+			{
+				result = convertible.Convert();
+				return true;
+			}
+
+			try
+			{
+				result = (T)obj;
+				return true;
+			}
+			catch (Exception) { }
+			try
+			{
+				result = (T)Convert.ChangeType(obj, typeof(T));
+				return true;
+			}
+			catch (Exception) { }
+
+			result = default!;
+			return false;
+		}
+
+		public static T ConvertTo<T>(this object obj)
+		{
+			return TryConvertTo(obj, out T result) ? result : default!;
 		}
 
 		public static bool TryConvertTo(this object obj, Type type, out object? convertedObj)
