@@ -6,13 +6,19 @@ namespace Utilities.Reflection
 	public static class TypeEx
 	{
 		public static bool IsStruct(this Type type)
-			=> type.IsValueType && !type.IsPrimitive && !type.IsEnum;
+			=> type != null && type.IsValueType && !type.IsPrimitive && !type.IsEnum;
 
 		public static bool Inherits<T>(this Type type)
 			=> Inherits(type, typeof(T));
 
 		public static bool Inherits(this Type type, Type otherType)
-			=> otherType.IsInterface ? otherType.IsAssignableFrom(type) : type.IsSubclassOf(otherType);
+		{
+			if (type == null && otherType == null) return true;
+
+			if (type == null || otherType == null) return false;
+
+			return otherType.IsInterface ? otherType.IsAssignableFrom(type) : type.IsSubclassOf(otherType);
+		}
 
 		public static bool TryGetAttribute<T>(this Type type, out T attribute)
 			where T : Attribute

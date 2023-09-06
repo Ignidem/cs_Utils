@@ -11,6 +11,7 @@ namespace Utils.StateMachines
 		K Key { get; }
 		bool IsActive { get; }
 
+		Task Reload(IStateData<K> data);
 		Task Preload(IStateData<K> data);
 		Task Enter(IStateMachine<K> stateMachine);
 		Task Exit();
@@ -23,6 +24,15 @@ namespace Utils.StateMachines
 		public bool IsActive { get; private set; }
 
 		private IStateMachine<K> _activeStateMachine;
+
+		public async Task Reload(IStateData<K> data)
+		{
+			IStateMachine<K> machine = _activeStateMachine;
+			await Cleanup();
+			await Exit();
+			await Preload(data);
+			await Enter(machine);
+		}
 
 		public Task Preload(IStateData<K> data) => OnPreload(data);
 		protected virtual Task OnPreload(IStateData<K> data) => Task.CompletedTask;

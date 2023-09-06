@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace Utils.EventSystem
 {
@@ -88,8 +87,8 @@ namespace Utils.EventSystem
             if (container is T eventContainer)
                 return eventContainer;
 
-			const string messageFormat = "Event Container \n {0} \n at Key {1} \n does not match types \n {2}";
-			string message = string.Join(messageFormat, container.GetType(), key, typeof(T));
+			const string messageFormat = "Event Container {0} at Key {1} does not match types {2}";
+			string message = string.Format(messageFormat, container.GetType().Name, key, typeof(T).Name);
 
 			throw new System.Exception(message);
         }
