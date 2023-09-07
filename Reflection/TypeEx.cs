@@ -17,6 +17,8 @@ namespace Utilities.Reflection
 
 			if (type == null || otherType == null) return false;
 
+			if (type == otherType) return true;
+
 			return otherType.IsInterface ? otherType.IsAssignableFrom(type) : type.IsSubclassOf(otherType);
 		}
 

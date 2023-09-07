@@ -103,12 +103,18 @@ namespace Utilities.Conversions
 			{
 				Type under = Enum.GetUnderlyingType(type);
 
+				object Default()
+				{
+					if (obj.GetType().Inherits(under) && Enum.TryParse(type, obj.ToString(), out object convertedObj))
+						return convertedObj;
+
+					return obj.TryChangeType(type, out convertedObj) ? convertedObj : default!;
+				}
+
 				return obj switch
 				{
 					string str => Enum.TryParse(type, str, true, out convertedObj),
-					_ => (obj.GetType().Inherits(under) && obj.TryChangeType(type, out convertedObj)) 
-						 ||
-						 ((convertedObj = null) != null),
+					_ =>  ((convertedObj = Default()) != null),
 				};
 			}
 			catch
