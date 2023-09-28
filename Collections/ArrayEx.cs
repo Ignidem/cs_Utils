@@ -42,6 +42,18 @@ namespace Utilities.Collections
 			return array;
 		}
 
+		public static T[] RemoveAt<T>(this T[] array, int index)
+		{
+			T[] dest = new T[array.Length - 1];
+			if (index > 0)
+				Array.Copy(array, 0, dest, 0, index);
+
+			if (index < array.Length - 1)
+				Array.Copy(array, index + 1, dest, index, array.Length - index - 1);
+
+			return dest;
+		}
+
 		public static T? RandomElement<T>(this T[] array, Random random)
 		{
 			if (array == null || array.Length == 0) return default;
