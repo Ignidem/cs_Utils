@@ -81,15 +81,19 @@ namespace Utilities.Collections
 
 		public static T[] Concat<T>(this T[] initial, params T[][] arrays)
 		{
-			int totalLength = initial.Length + arrays.Sum(a => a.Length);
+			if (arrays == null) return initial;
+
+			int initialLength = initial?.Length ?? 0;
+			int totalLength = initialLength + arrays.Sum(a => a?.Length ?? 0);
 			T[] result = new T[totalLength];
 
-			Array.Copy(initial, result, initial.Length);
-			int resultIndex = initial.Length;
+			Array.Copy(initial, result, initialLength);
+			int resultIndex = initialLength;
 
 			for (int i = 0; i < arrays.Length; i++)
 			{
 				T[] array = arrays[i];
+				if (array == null) continue;
 				Array.Copy(array, 0, result, resultIndex, array.Length);
 				resultIndex += array.Length;
 			}
