@@ -33,7 +33,18 @@ namespace Utilities.Enumerable
 		private readonly int ySize;
 		private T[,] _values;
 
-		public Index2D<T> Current => new Index2D<T>(x, y, _values[x,y]);
+		public Index2D<T> Current
+		{
+			get
+			{
+				if (x >= xSize || y >= ySize)
+				{
+					UnityEngine.Debug.Log($"{x} {y}");
+				}
+
+				return new Index2D<T>(x, y, _values[x, y]);
+			}
+		}
 
 		object IEnumerator.Current => Current;
 
@@ -49,15 +60,16 @@ namespace Utilities.Enumerable
 		{
 			if (_values == null) return false;
 
-			if (y < ySize)
+			y++;
+			if (y >= ySize)
 			{
-				y++;
-				return true;
+				x++;
+				if (x >= xSize) return false;
+
+				y = 0;
 			}
 
-			x++;
-			y = 0;
-			return x <= xSize;
+			return x < xSize && y < ySize;
 		}
 
 		public void Reset()
