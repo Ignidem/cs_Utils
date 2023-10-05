@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace Utilities.Collections
@@ -76,6 +77,24 @@ namespace Utilities.Collections
 			}
 
 			return text;
+		}
+
+		public static T[] Concat<T>(this T[] initial, params T[][] arrays)
+		{
+			int totalLength = initial.Length + arrays.Sum(a => a.Length);
+			T[] result = new T[totalLength];
+
+			Array.Copy(initial, result, initial.Length);
+			int resultIndex = initial.Length;
+
+			for (int i = 0; i < arrays.Length; i++)
+			{
+				T[] array = arrays[i];
+				Array.Copy(array, 0, result, resultIndex, array.Length);
+				resultIndex += array.Length;
+			}
+
+			return result;
 		}
 	}
 }
