@@ -58,5 +58,16 @@ namespace Utilities.Reflection
 
 			return baseType.GetBase(targetType);
 		}
+
+		public static Type BuildGeneric(this Type type, params Type[] genericArgs)
+		{
+			if (type.IsGenericType)
+				type = type.GetGenericTypeDefinition();
+
+			if (!type.IsGenericTypeDefinition)
+				return type;
+
+			return type.MakeGenericType(genericArgs);
+		}
 	}
 }

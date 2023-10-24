@@ -3,8 +3,11 @@ using System.Threading.Tasks;
 
 namespace Utils.StateMachines
 {
-
-	public interface IState { }
+	public interface IState 
+	{
+		Task Exit();
+		Task Cleanup();
+	}
 
 	public interface IState<K> : IState
 	{
@@ -14,8 +17,6 @@ namespace Utils.StateMachines
 		Task Reload(IStateData<K> data);
 		Task Preload(IStateData<K> data);
 		Task Enter(IStateMachine<K> stateMachine);
-		Task Exit();
-		Task Cleanup();
 	}
 
 	public abstract class State<K> : IState<K>
