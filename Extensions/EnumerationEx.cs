@@ -7,7 +7,7 @@ namespace Utilities.Extensions
 #nullable enable
 	public static class EnumerationEx
 	{
-		private static Random rand = new(Guid.NewGuid().GetHashCode());
+		public readonly static Random rand = new(Guid.NewGuid().GetHashCode());
 
 		public static (T?, V?) RandomElement<T, V>(this Dictionary<T, V> dict)
 			where T : notnull
@@ -40,6 +40,5 @@ namespace Utilities.Extensions
 			int index = random.Next(0, list.Length);
 			return list[index];
 		}
-
 	}
 }
