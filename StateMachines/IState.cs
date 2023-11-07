@@ -66,6 +66,12 @@ namespace Utils.StateMachines
 		public Task Cleanup() => OnCleanup();
 		protected virtual Task OnCleanup() => Task.CompletedTask;
 
+		protected async Task CloseState()
+		{
+			await Cleanup();
+			await Exit();
+		}
+
 		protected Task SwitchState(IStateData<K> data)
 		{
 			if (!IsActive) return Task.CompletedTask;

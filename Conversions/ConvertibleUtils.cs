@@ -82,7 +82,7 @@ namespace Utilities.Conversions
 		{
 			Type currentType = obj.GetType();
 
-			if (currentType == type)
+			if (currentType == type || type.IsAssignableFrom(currentType))
 				return (convertedObj = obj) != null;
 
 			return
