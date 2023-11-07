@@ -8,6 +8,14 @@ namespace Utilities.Reflection
 		public static bool IsStruct(this Type type)
 			=> type != null && type.IsValueType && !type.IsPrimitive && !type.IsEnum;
 
+		public static object GetDefault(this Type type)
+		{
+			if (type.IsStruct())
+				return Activator.CreateInstance(type);
+
+			return null;
+		}
+
 		public static bool Inherits<T>(this Type type)
 			=> Inherits(type, typeof(T));
 
