@@ -1,13 +1,23 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.External.cs_utils.Collections
+namespace Utils.Collections
 {
 	public static class ListEx
 	{
+		public static IEnumerable<T> ToEnumerable<T>(this IList list)
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (list[i] is not T _t) continue;
+				yield return _t;
+			}
+		}
+
 		public static bool TryPop<T>(this List<T> list, out T item)
 		{
 			if (list.Count == 0)
