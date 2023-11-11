@@ -11,9 +11,9 @@ namespace Utils.Collections
 	{
 		public static IEnumerable<T> ToEnumerable<T>(this IList list)
 		{
-			for (int i = 0; i < list.Count; i++)
+			foreach (var e in list)
 			{
-				if (list[i] is not T _t) continue;
+				if (e is not T _t) continue;
 				yield return _t;
 			}
 		}
