@@ -15,7 +15,7 @@ namespace Utils.Results
 
 		public static Result Empty = new Result(false, null);
 
-		public static Task<Result> AsTask(Result result)
+		public static Task<Result> ToTask(Result result)
 		{
 			return Task.FromResult(result);
 		}
