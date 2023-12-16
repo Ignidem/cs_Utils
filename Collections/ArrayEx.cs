@@ -79,6 +79,9 @@ namespace Utilities.Collections
 			return text;
 		}
 
+		public static T[] AddMany<T>(this T[] initial, params T[] elements)
+			=> initial.Concat(elements);
+
 		public static T[] Concat<T>(this T[] initial, params T[][] arrays)
 		{
 			if (arrays == null) return initial;
