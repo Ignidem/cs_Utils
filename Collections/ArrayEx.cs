@@ -38,6 +38,9 @@ namespace Utilities.Collections
 
 		public static T[] AddElement<T>(this T[] array, T element)
 		{
+			if (array == null || array.Length == 0)
+				return new T[] { element };
+
 			Array.Resize(ref array, array.Length + 1);
 			array[^1] = element;
 			return array;
