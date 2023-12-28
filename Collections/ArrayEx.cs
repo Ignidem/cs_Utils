@@ -93,7 +93,8 @@ namespace Utilities.Collections
 			int totalLength = initialLength + arrays.Sum(a => a?.Length ?? 0);
 			T[] result = new T[totalLength];
 
-			Array.Copy(initial, result, initialLength);
+			if (initialLength != 0)
+				Array.Copy(initial, result, initialLength);
 			int resultIndex = initialLength;
 
 			for (int i = 0; i < arrays.Length; i++)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Utilities.Reflection
 {
@@ -38,5 +39,10 @@ namespace Utilities.Reflection
             //Finally, if we already had the fields in our dictionary or just added them, return our fields
             return fields;
         }
+
+		public static bool IsBackingField(this FieldInfo info)
+		{
+			return info.IsDefined(typeof(CompilerGeneratedAttribute), false);
+		}
     }
 }
