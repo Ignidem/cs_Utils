@@ -47,5 +47,17 @@ namespace Utils.Collections
 			item = default;
 			return false;
 		}
+
+		public static int IndexOf<T>(this IReadOnlyList<T> self, T target)
+		{
+			for (int i = 0; i < self.Count; i++)
+			{
+				T element = self[i];
+				if (Equals(element, target))
+					return i;
+			}
+
+			return -1;
+		}
 	}
 }
