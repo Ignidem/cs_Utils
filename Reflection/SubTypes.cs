@@ -14,12 +14,12 @@ namespace Utilities.Reflection
             if (subTypes.TryGetValue(type, out Type[]? types)) 
                 return types;
 
-            types = type.GetImplements().ToArray();
+            types = type.GetImplementations().ToArray();
             subTypes.Add(type, types);
             return types;
         }
 
-        public static IEnumerable<Type> GetImplements(this Type type)
+        public static IEnumerable<Type> GetImplementations(this Type type)
         {
 			System.Reflection.Assembly assembly = type.Assembly;
             return assembly.GetTypes().Where(t =>
