@@ -8,7 +8,6 @@ namespace Utils.StateMachines
 	public class StateMachine<K> : IStateMachine<K>
 	{
 		public IState<K> ActiveState { get; protected set; }
-		IState IStateMachine.ActiveState => ActiveState;
 		protected Dictionary<K, IState<K>> States;
 		public event StateChangeDelegate<K> OnStateChange;
 		public event ExceptionHandlerDelegate OnException;
@@ -48,6 +47,9 @@ namespace Utils.StateMachines
 			ActiveState = null;
 		}
 
+		protected void StateChanged(IState<K> state) => OnStateChange(ActiveState, state);
+		protected void ExceptionCaught(Exception e) => OnException(e);
+
 		private async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
 			if (state == ActiveState) return;
@@ -73,5 +75,6 @@ namespace Utils.StateMachines
 				OnException(e);
 			}
 		}
+
 	}
 }

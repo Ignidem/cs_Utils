@@ -16,6 +16,7 @@ namespace Utils.StateMachines
 	public interface IStateMachine<K> : IStateMachine
 	{
 		new IState<K> ActiveState { get; }
+		IState IStateMachine.ActiveState => ActiveState;
 		event StateChangeDelegate<K> OnStateChange;
 		Task SwitchState(IStateData<K> data);
 		Task SwitchState(K key);

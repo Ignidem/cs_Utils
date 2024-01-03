@@ -19,68 +19,25 @@ namespace Utilities.Enumerable
 
 	public static class EnumratorUtils
 	{
-		public static IEnumerator<Index2D<T>> Enumerate2D<T>(this T[,] array)
+		public static IEnumerable<Index2D<T>> Enumerate2D<T>(this T[,] array)
 		{
-			return new Enumerator2D<T>(array);
-		}
-	}
-
-	public class Enumerator2D<T> : IEnumerator<Index2D<T>>
-	{
-		int x = 0;
-		int y = -1;
-		private readonly int xSize;
-		private readonly int ySize;
-		private T[,] _values;
-
-		public Index2D<T> Current
-		{
-			get
+			int xl = array?.GetLength(0) ?? 0;
+			int yl = array?.GetLength(1) ?? 0;
+			for(int x = 0; x < xl; x++) for (int y = 0; y < yl; y++)
 			{
-				if (x >= xSize || y >= ySize)
-				{
-					UnityEngine.Debug.Log($"{x} {y}");
-				}
-
-				return new Index2D<T>(x, y, _values[x, y]);
+				yield return new Index2D<T>(x, y, array[x, y]);
 			}
 		}
 
-		object IEnumerator.Current => Current;
-
-		public Enumerator2D(T[,] values)
+		public static IEnumerable<Index2D<T>> Enumerate2D<T, R>(this R[,] array)
+			where R : T
 		{
-			_values = values;
-			if (_values == null) return;
-			xSize = _values.GetLength(0);
-			ySize = _values.GetLength(1);
-		}
-
-		public bool MoveNext()
-		{
-			if (_values == null) return false;
-
-			y++;
-			if (y >= ySize)
+			int xl = array?.GetLength(0) ?? 0;
+			int yl = array?.GetLength(1) ?? 0;
+			for (int x = 0; x < xl; x++) for (int y = 0; y < yl; y++)
 			{
-				x++;
-				if (x >= xSize) return false;
-
-				y = 0;
+				yield return new Index2D<T>(x, y, array[x, y]);
 			}
-
-			return x < xSize && y < ySize;
-		}
-
-		public void Reset()
-		{
-			x = 0;
-			y = -1;
-		}
-
-		public void Dispose()
-		{
-			_values = null;
 		}
 	}
 }

@@ -20,15 +20,24 @@ namespace Utils.Collections
 
 		public static bool TryPop<T>(this List<T> list, out T item)
 		{
+			if (TryPeek(list, out item))
+			{
+				list.RemoveAt(list.Count - 1);
+				return true;
+			}
+
+			return false;
+		}
+
+		public static bool TryPeek<T>(this List<T> list, out T item)
+		{
 			if (list.Count == 0)
 			{
 				item = default;
 				return false;
 			}
 
-			int lastIndex = list.Count - 1;
-			item = list[lastIndex];
-			list.RemoveAt(lastIndex);
+			item = list[^1];
 			return true;
 		}
 
@@ -54,6 +63,18 @@ namespace Utils.Collections
 			{
 				T element = self[i];
 				if (Equals(element, target))
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static int IndexOf<T>(this IReadOnlyList<T> self, Predicate<T> predicate)
+		{
+			for (int i = 0; i < self.Count; i++)
+			{
+				T element = self[i];
+				if (predicate(element))
 					return i;
 			}
 
