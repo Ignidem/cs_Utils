@@ -29,5 +29,10 @@ namespace Utils.Results
 			IsSuccess = isSuccess;
 			Message = message;
 		}
+
+		public override string ToString()
+		{
+			return Message;
+		}
 	}
 }

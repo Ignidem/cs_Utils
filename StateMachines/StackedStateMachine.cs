@@ -8,7 +8,18 @@ namespace Utils.StateMachines
 {
 	public interface IStackableState
 	{
+		/// <summary>
+		/// State has Exited and was stacked.
+		/// </summary>
+		/// <param name="index">The index at which the state was stacked.</param>
+		/// <returns></returns>
 		Task OnStacked(int index);
+
+		/// <summary>
+		/// State has exited but will not be stacked.
+		/// </summary>
+		/// <param name="index">The index the state was stacked at.</param>
+		/// <returns></returns>
 		Task OnDestacked(int index);
 	}
 
@@ -39,16 +50,13 @@ namespace Utils.StateMachines
 		{
 			if (stack.TryPop(out IState<K> prevState))
 			{
-				await SwitchState(prevState, false);
+				await SwitchState(prevState, null, false);
 				return;
 			}
 
 			try
 			{
-				await ActiveState.Exit();
-				await ActiveState.Cleanup();
-				if (ActiveState is IStackableState stackable)
-					await stackable.OnDestacked(stack.Count);
+				await ExitState(ActiveState);
 			}
 			catch (Exception e)
 			{
@@ -56,27 +64,67 @@ namespace Utils.StateMachines
 			}
 		}
 
-		public async Task SwitchState(IState<K> state, bool doStack = true)
+		public Task SwitchState(IStateData<K> data, bool doStack = true)
 		{
-			try
+			K key = data.Key;
+			if (!States.TryGetValue(key, out IState<K> state))
+				return Task.CompletedTask;
+
+			return SwitchState(state, data, doStack);
+		}
+
+		public async Task SwitchState(IState<K> state, IStateData<K> data = null, bool doStack = true)
+		{
+			if (state == null)
 			{
-				IState<K> oldState = ActiveState;
-				IStackableState stackable = oldState as IStackableState;
-				await state.Preload(null);
-				if (doStack) 
+				await ExitActiveState();
+				return;
+			}
+
+			IState<K> oldState = ActiveState;
+			bool hadState = oldState != null;
+			if (hadState && oldState.Key.Equals(state.Key))
+			{
+				try
 				{
-					stack.Add(oldState);
-					await stackable?.OnStacked(stack.Count - 1);
+					await oldState.Reload(data);
+				}
+				catch (Exception e)
+				{
+					ExceptionCaught(e);
 				}
 
-				await oldState.Exit();
+				return;
+			}
+
+			bool isStackable = true;
+			if (oldState is not IStackableState stackable)
+			{
+				isStackable = false;
+				stackable = null;
+			}
+
+			try
+			{
+				await state.Preload(data);
+
+				if (doStack && oldState != null)
+					stack.Add(oldState);
+
+				if (hadState)
+					await oldState.Exit();
+
+				if (doStack && isStackable) 
+					await stackable.OnStacked(stack.Count - 1);
+
 				ActiveState = state;
 				await state.Enter(this);
-				await oldState.Cleanup();
-				if (!doStack)
-				{
+
+				if (!doStack && isStackable) 
 					await stackable?.OnDestacked(stack.Count);
-				}
+
+				if (hadState)
+					await oldState.Cleanup();
 			}
 			catch (Exception e)
 			{
@@ -90,8 +138,8 @@ namespace Utils.StateMachines
 			if (index < 0) return;
 			index++;
 			await DestackRange(index, stack.Count - index);
-			if (!stack.TryPop(out var data)) return;
-			await SwitchState(data, false);
+			if (!stack.TryPop(out IState<K> state)) return;
+			await SwitchState(state, null, false);
 		}
 
 		private async Task DestackRange(int index, int count)
@@ -101,8 +149,7 @@ namespace Utils.StateMachines
 				try
 				{
 					IState<K> state = stack[i];
-					await state.Exit();
-					await state.Cleanup();
+					await ExitState(state);
 					stack.RemoveAt(i);
 				}
 				catch (Exception e)
@@ -110,6 +157,13 @@ namespace Utils.StateMachines
 					ExceptionCaught(e);
 				}
 			}
+		}
+
+		private async Task ExitState(IState<K> state)
+		{
+			await state.Exit();
+			await (state as IStackableState)?.OnDestacked(stack.Count);
+			await state.Cleanup();
 		}
 	}
 }

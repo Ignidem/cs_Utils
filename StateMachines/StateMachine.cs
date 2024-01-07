@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Utils.StateMachines
 {
-	public class StateMachine<K> : IStateMachine<K>
+	public class StateMachine<K> : IStateMachine<K>, IDisposable
 	{
 		public IState<K> ActiveState { get; protected set; }
 		protected Dictionary<K, IState<K>> States;
@@ -30,7 +30,7 @@ namespace Utils.StateMachines
 				await SwitchState(state, null);
 		}
 
-		public async Task ExitActiveState()
+		public virtual async Task ExitActiveState()
 		{
 			if (ActiveState == null) return;
 
@@ -50,7 +50,7 @@ namespace Utils.StateMachines
 		protected void StateChanged(IState<K> state) => OnStateChange(ActiveState, state);
 		protected void ExceptionCaught(Exception e) => OnException(e);
 
-		private async Task SwitchState(IState<K> state, IStateData<K> data)
+		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
 			if (state == ActiveState) return;
 
@@ -76,5 +76,13 @@ namespace Utils.StateMachines
 			}
 		}
 
+		public virtual void Dispose()
+		{
+			foreach (IState<K> state in States.Values)
+			{
+				if (state is IDisposable disp)
+					disp.Dispose();
+			}
+		}
 	}
 }
