@@ -8,6 +8,15 @@ namespace Utils.Collections
 {
 	public static class LinqEx
 	{
+		public static IEnumerable<TTarget> SelectAs<T, TTarget>(this IEnumerable<T> e)
+		{
+			foreach(T t in e)
+			{
+				if (t is TTarget _t)
+					yield return _t;
+			}
+		}
+
 		public static T WhereMax<T, N>(this IEnumerable<T> items, Func<T, N> getComparable)
 			where N : IComparable<N>
 		{
