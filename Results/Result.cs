@@ -15,7 +15,7 @@ namespace Utils.Results
 
 		public static Result Empty = new Result(false, null);
 
-		public static Task<Result> AsTask(Result result)
+		public static Task<Result> AsTaskResult(Result result)
 		{
 			return Task.FromResult(result);
 		}
@@ -32,7 +32,7 @@ namespace Utils.Results
 
 		public override string ToString()
 		{
-			return Message;
+			return Message ?? (IsSuccess ? "Success" : "Failure");
 		}
 	}
 }
