@@ -100,7 +100,7 @@ namespace Utilities.Collections
 			for (int i = 0; i < arrays.Length; i++)
 			{
 				T[] array = arrays[i];
-				if (array == null) continue;
+				if (array == null || array.Length == 0) continue;
 				Array.Copy(array, 0, result, resultIndex, array.Length);
 				resultIndex += array.Length;
 			}
