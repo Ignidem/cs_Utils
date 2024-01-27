@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Utilities.Enums;
 
 namespace Utilities.Extensions
 {
@@ -34,7 +35,7 @@ namespace Utilities.Extensions
 		{
 			random ??= rand;
 
-			T[]? list = (T[])Enum.GetValues(typeof(T));
+			T[]? list = EnumUtils.GetValues<T>();
 			if (list is null || list.Length == 0) return default;
 
 			int index = random.Next(0, list.Length);
