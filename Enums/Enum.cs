@@ -53,8 +53,8 @@ namespace Utilities.Enums
 			T[] array = GetValues<T>();
 			for (int i = 0; i < array.Length; i++)
 			{
-				T? value = array[i];
-				if (value == null || !flags.HasFlag(value))
+				T value = array[i];
+				if (!flags.HasFlag(value))
 					continue;
 
 				yield return value;
