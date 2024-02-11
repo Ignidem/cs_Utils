@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -80,6 +81,24 @@ namespace Utilities.Collections
 			}
 
 			return text;
+		}
+
+		public static StringBuilder ToString<T>(this IList<T> array, char separator, Func<T, string>? elementToString = null)
+		{
+			StringBuilder sb = new();
+			for (int i = 0; i < array.Count; i++)
+			{
+				T? element = array[i];
+
+				if (element == null)
+					continue;
+
+				if (sb.Length > 0)
+					sb.Append(separator);
+				sb.Append(elementToString?.Invoke(element) ?? element.ToString());
+			}
+
+			return sb;
 		}
 
 		public static T[] AddMany<T>(this T[] initial, params T[] elements)
