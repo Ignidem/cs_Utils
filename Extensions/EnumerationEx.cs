@@ -19,7 +19,7 @@ namespace Utilities.Extensions
 			return (keypair.Key, keypair.Value);
 		}
 
-		public static T? RandomElement<T>(this List<T> list)
+		public static T? RandomElement<T>(this IList<T> list)
 			=> list == null || list.Count == 0 ? default : list[rand.Next(0, list.Count)];
 
 		public static T? RandomElement<T>(this IEnumerable<T> list)
