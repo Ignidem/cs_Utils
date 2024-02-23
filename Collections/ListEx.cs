@@ -18,6 +18,14 @@ namespace Utils.Collections
 			}
 		}
 
+		public static T Pop<T>(this List<T> list)
+		{
+			int index = list.Count - 1;
+			T value = list[index];
+			list.RemoveAt(index);
+			return value;
+		}
+
 		public static bool TryPop<T>(this List<T> list, out T item)
 		{
 			if (TryPeek(list, out item))

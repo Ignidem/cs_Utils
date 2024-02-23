@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Utilities.Enums;
@@ -9,6 +10,11 @@ namespace Utilities.Extensions
 	public static class EnumerationEx
 	{
 		public readonly static Random rand = new(Guid.NewGuid().GetHashCode());
+
+		public static int RandomIndex(this IList list)
+		{
+			return rand.Next(0, list.Count);
+		}
 
 		public static (T?, V?) RandomElement<T, V>(this Dictionary<T, V> dict)
 			where T : notnull
