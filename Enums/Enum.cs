@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Utilities.Extensions;
 
 namespace Utilities.Enums
@@ -39,26 +38,5 @@ namespace Utilities.Enums
 		}
 
 		public T Value { get; set; } = default!;
-	}
-
-	public static class EnumUtils
-	{
-		public static T[] GetValues<T>() where T : Enum
-		{
-			return (T[])Enum.GetValues(typeof(T));
-		}
-
-		public static IEnumerable<T> GetFlags<T>(this T flags) where T : Enum
-		{
-			T[] array = GetValues<T>();
-			for (int i = 0; i < array.Length; i++)
-			{
-				T value = array[i];
-				if (!flags.HasFlag(value))
-					continue;
-
-				yield return value;
-			}
-		}
 	}
 }
