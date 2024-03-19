@@ -15,7 +15,7 @@ namespace Utilities.Reflection
                 return types;
 
             types = type.GetImplementations().ToArray();
-            subTypes.Add(type, types);
+            subTypes[type] = types;
             return types;
         }
 
