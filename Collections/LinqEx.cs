@@ -8,6 +8,13 @@ namespace Utils.Collections
 {
 	public static class LinqEx
 	{
+		public static IEnumerable<Target> As<T, Target>(this IReadOnlyList<T> list)
+			where T : Target
+		{
+			for (int i = 0; i < list.Count; i++)
+				yield return list[i];
+		}
+
 		public static IEnumerable<TTarget> SelectAs<T, TTarget>(this IEnumerable<T> e)
 		{
 			foreach(T t in e)
