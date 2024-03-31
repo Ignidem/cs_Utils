@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Utilities.Reflection
@@ -31,12 +32,29 @@ namespace Utilities.Reflection
 		}
 
 		public static bool TryGetAttribute<T>(this Type type, out T attribute)
-			where T : Attribute
 		{
-#pragma warning disable CS8601 // Possible null reference assignment.
-			attribute = Attribute.GetCustomAttribute(type, typeof(T)) as T;
-#pragma warning restore CS8601 // Possible null reference assignment.
-			return attribute != null;
+			Type t = typeof(T);
+			if (!typeof(Attribute).IsAssignableFrom(t))
+			{
+				if (!t.IsInterface)
+				{
+					attribute = default;
+					return false;
+				}
+				else if (Attribute.GetCustomAttributes(type).FirstOrDefault(_attr => _attr is T) is T attr)
+				{
+					attribute = attr;
+					return true;
+				}
+			}
+			else if (Attribute.GetCustomAttribute(type, typeof(T)) is T attr)
+			{
+				attribute = attr;
+				return true;
+			}
+
+			attribute = default;
+			return false;
 		}
 
 		public static bool TryGetBase<T>(this Type type, out Type result)
