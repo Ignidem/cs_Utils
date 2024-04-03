@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using Utilities.Conversions;
+using Utils.Reflection.Members;
 
 namespace Utilities.Reflection.Members
 {
@@ -50,16 +52,31 @@ namespace Utilities.Reflection.Members
 			=> member?.MemberInfo as MethodInfo;
 		#endregion
 
+		#region Expressions
+		private static ParameterExpression? GetInstanceParameter(bool isStatic)
+		{
+			return isStatic ? null : Expression.Parameter(typeof(object), "instance");
+		}
+		#endregion
+
 		public MemberInfo MemberInfo { get; private set; }
 		public MemberTypes MemberType => MemberInfo.MemberType;
 		public bool CanRead { get; private set; }
 		public bool CanWrite { get; private set; }
+
+		private Action<object?, object?>? setter;
+		private Func<object?, object?>? getter;
 
 		private Member(FieldInfo field)
 		{
 			MemberInfo = field;
 			CanRead = true;
 			CanWrite = true;
+
+			ParameterExpression? instanceExpr = GetInstanceParameter(field.IsStatic);
+			MemberExpression fieldExpr = field.ToExpression(instanceExpr);
+			getter = fieldExpr.ToGetDelegate(instanceExpr);
+			setter = fieldExpr.ToSetDelegate(instanceExpr);
 		}
 
 		private Member(PropertyInfo prop)
@@ -67,6 +84,13 @@ namespace Utilities.Reflection.Members
 			MemberInfo = prop;
 			CanRead = prop.CanRead;
 			CanWrite = prop.CanWrite;
+
+			ParameterExpression? instanceExpr = GetInstanceParameter(prop.GetMethod.IsStatic);
+			MemberExpression fieldExpr = prop.ToExpression(instanceExpr);
+			if (CanRead)
+				getter = fieldExpr.ToGetDelegate(instanceExpr);
+			if (CanWrite)
+				setter = fieldExpr.ToSetDelegate(instanceExpr);
 		}
 
 		private Member(MethodInfo method)
@@ -78,6 +102,9 @@ namespace Utilities.Reflection.Members
 
 		public object? Read(object? instance = null)
 		{
+			if (getter != null)
+				return getter(instance);
+
 			return MemberType switch
 			{
 				MemberTypes.Field => (MemberInfo as FieldInfo)?.GetValue(instance),
@@ -102,6 +129,12 @@ namespace Utilities.Reflection.Members
 
 		public void Write(object? value)
 		{
+			if (setter != null)
+			{
+				setter(null, value);
+				return;
+			}
+
 			switch (MemberType)
 			{
 				case MemberTypes.Field:
@@ -118,6 +151,12 @@ namespace Utilities.Reflection.Members
 
 		public void Write(object? instance, object? value)
 		{
+			if (setter != null)
+			{
+				setter(instance, value);
+				return;
+			}
+
 			switch (MemberType)
 			{
 				case MemberTypes.Field:
