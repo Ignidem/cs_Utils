@@ -33,10 +33,13 @@ namespace Utils.StateMachines
 		{
 			try
 			{
-				await ActiveState.Exit();
-				await ActiveState.Cleanup();
-				if (ActiveState is IStackableState stackable)
-					await stackable.OnDestacked(stack.Count);
+				if (ActiveState != null)
+				{
+					await ActiveState.Exit();
+					await ActiveState.Cleanup();
+					if (ActiveState is IStackableState stackable)
+						await stackable.OnDestacked(stack.Count);
+				}
 			}
 			catch (Exception e)
 			{
