@@ -68,7 +68,7 @@ namespace Utils.StateMachines
 				if (oldState != null)
 					await oldState?.Cleanup();
 
-				OnStateChange(ActiveState, state);
+				OnStateChange(oldState, state);
 			}
 			catch (Exception e)
 			{
