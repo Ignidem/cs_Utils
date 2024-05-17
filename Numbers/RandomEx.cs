@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace Utilities.Numbers
 {
-    public static class RandomEx
+
+	public static class RandomEx
     {
         private static readonly Random rng = new Random();
 
