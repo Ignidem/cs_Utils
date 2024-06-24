@@ -21,7 +21,7 @@ namespace Utils.Results
 		public static Result<T> operator &(Result<T> left, Result<T> right) => !left ? left : right;
 		public static Result<T> operator |(Result<T> left, Result<T> right) => left ? left : (right ? right : left);
 
-		public static Result Empty = new Result(false, null);
+		public static Result<T> Empty = new Result<T>(default(T));
 
 		public static Task<Result<T>> AsTaskResult(Result<T> result)
 		{
