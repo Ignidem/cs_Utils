@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Utilities.Collections;
 
 namespace Utilities.Reflection
 {
@@ -19,12 +21,15 @@ namespace Utilities.Reflection
             return types;
         }
 
-        public static IEnumerable<Type> GetImplementations(this Type type)
+        public static IEnumerable<Type> GetImplementations(this Type type, params Assembly[] assemblies)
         {
-			System.Reflection.Assembly assembly = type.Assembly;
-            return assembly.GetTypes().Where(t =>
+			if (assemblies == null || assemblies.Length == 0)
+				assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+			return assemblies.SelectMany(a => a.GetTypes().Where(t =>
                 !t.IsInterface && !t.IsAbstract
-                && (t == type || t.Inherits(type)));
+                && (t == type || t.Inherits(type)))
+			);
         }
     }
 }
