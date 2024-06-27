@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Numerics;
 using Utilities.Reflection;
+using Utils.Numbers.Vectors.VectorInt;
 
 namespace Utils.Serializers.CustomSerializers
 {
