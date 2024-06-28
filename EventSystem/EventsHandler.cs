@@ -2,12 +2,7 @@
 
 namespace Utils.EventSystem
 {
-	public interface IEventHandler
-	{
-
-	}
-
-    public class EventHandler<TKey> : IEventHandler
+	public class EventHandler<TKey> : IEventHandler<TKey>
 	{
         private readonly Dictionary<TKey, IEventContainer> eventsContainers
 			= new Dictionary<TKey, IEventContainer>();
