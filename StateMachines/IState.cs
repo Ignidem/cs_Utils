@@ -89,8 +89,15 @@ namespace Utils.StateMachines
 
 		protected async Task CloseState()
 		{
-			await Exit();
-			await Cleanup();
+			if (_activeStateMachine?.ActiveState == this)
+			{
+				await _activeStateMachine.ExitActiveState();
+			}
+			else
+			{
+				await Exit();
+				await Cleanup();
+			}
 		}
 
 		protected Task SwitchState(IStateData<K> data)

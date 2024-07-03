@@ -17,14 +17,14 @@ namespace Utils.StateMachines
 			States = states.ToDictionary(state => state.Key, state => state);
 		}
 
-		public async Task SwitchState(IStateData<K> data)
+		public virtual async Task SwitchState(IStateData<K> data)
 		{
 			K key = data.Key;
 			if (States.TryGetValue(key, out IState<K> state))
 				await SwitchState(state, data);
 		}
 
-		public async Task SwitchState(K key)
+		public virtual async Task SwitchState(K key)
 		{
 			if (States.TryGetValue(key, out IState<K> state))
 				await SwitchState(state, null);
@@ -68,11 +68,11 @@ namespace Utils.StateMachines
 				if (oldState != null)
 					await oldState?.Cleanup();
 
-				OnStateChange(oldState, state);
+				OnStateChange?.Invoke(oldState, state);
 			}
 			catch (Exception e)
 			{
-				OnException(e);
+				OnException?.Invoke(e);
 			}
 		}
 
