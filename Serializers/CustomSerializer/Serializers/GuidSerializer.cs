@@ -1,6 +1,4 @@
-﻿using Mono.Data.Sqlite;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Utils.Serializers.CustomSerializers
 {
