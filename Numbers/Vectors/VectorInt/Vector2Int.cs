@@ -47,5 +47,10 @@ namespace Utils.Numbers.Vectors.VectorInt
 		{
 			return HashCode.Combine(x, y);
 		}
+
+		public override readonly string ToString()
+		{
+			return $"({x}, {y})";
+		}
 	}
 }
