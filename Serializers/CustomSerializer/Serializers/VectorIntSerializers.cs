@@ -3,16 +3,16 @@ using Utils.Numbers.Vectors.VectorInt;
 
 namespace Utils.Serializers.CustomSerializers
 {
-	public class Vector2IntSerializer : Serializer<Vector2Int, string>
+	public class Vector2IntSerializer : Serializer<Numbers.Vectors.VectorInt.Vector2, string>
 	{
-		protected override Vector2Int Deserialize(string value)
+		protected override Numbers.Vectors.VectorInt.Vector2 Deserialize(string value)
 		{
 			string[] split = value.Split(',');
 			int Parse(int i) => int.TryParse(split[i], out int v) ? v : 0;
-			return new Vector2Int(Parse(0), Parse(1));
+			return new Numbers.Vectors.VectorInt.Vector2(Parse(0), Parse(1));
 		}
 
-		protected override string Serialize(Vector2Int input)
+		protected override string Serialize(Numbers.Vectors.VectorInt.Vector2 input)
 		{
 			return $"{input.x},{input.y}";
 		}
@@ -33,16 +33,16 @@ namespace Utils.Serializers.CustomSerializers
 		}
 	}
 
-	public class Vector2Serializer : Serializer<Vector2, string>
+	public class Vector2Serializer : Serializer<System.Numerics.Vector2, string>
 	{
-		protected override Vector2 Deserialize(string value)
+		protected override System.Numerics.Vector2 Deserialize(string value)
 		{
 			string[] split = value.Split(',');
 			float Parse(int i) => float.TryParse(split[i], out float v) ? v : 0;
-			return new Vector2(Parse(0), Parse(1));
+			return new System.Numerics.Vector2(Parse(0), Parse(1));
 		}
 
-		protected override string Serialize(Vector2 input)
+		protected override string Serialize(System.Numerics.Vector2 input)
 		{
 			return $"{input.X},{input.Y}";
 		}
