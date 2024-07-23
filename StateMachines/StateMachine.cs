@@ -52,7 +52,11 @@ namespace Utils.StateMachines
 
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
-			if (state == ActiveState) return;
+			if (state == ActiveState)
+			{
+				await ActiveState.Reload(data);
+				return;
+			}
 
 			try
 			{
