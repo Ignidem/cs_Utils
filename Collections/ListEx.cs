@@ -9,6 +9,17 @@ namespace Utils.Collections
 {
 	public static class ListEx
 	{
+		public static IEnumerable<int> Indexed<T>(this IReadOnlyList<T> list)
+		{
+			for (int i = 0; i < list.Count; i++)
+				yield return i;
+		}
+		public static IEnumerable<int> Indexed(this IList list)
+		{
+			for (int i = 0; i < list.Count; i++)
+				yield return i;
+		}
+
 		public static IEnumerable<T> ToEnumerable<T>(this IList list)
 		{
 			foreach (var e in list)
