@@ -49,11 +49,11 @@ namespace Utils.StateMachines
 			await DestackRange(0, stack.Count);
 		}
 
-		public async Task BackState()
+		public async Task BackState(IStateData<K> data = null)
 		{
 			if (stack.TryPop(out IState<K> prevState))
 			{
-				await SwitchState(prevState, null, false);
+				await SwitchState(prevState, data, false);
 				return;
 			}
 
@@ -123,11 +123,11 @@ namespace Utils.StateMachines
 				ActiveState = state;
 				await state.Enter(this);
 
-				if (!doStack && isStackable) 
-					await stackable?.OnDestacked(stack.Count);
-
 				if (hadState)
 					await oldState.Cleanup();
+
+				if (!doStack && isStackable) 
+					await stackable?.OnDestacked(stack.Count);
 			}
 			catch (Exception e)
 			{
@@ -165,8 +165,8 @@ namespace Utils.StateMachines
 		private async Task ExitState(IState<K> state)
 		{
 			await state.Exit();
-			await (state as IStackableState)?.OnDestacked(stack.Count);
 			await state.Cleanup();
+			await (state as IStackableState)?.OnDestacked(stack.Count);
 		}
 	}
 }

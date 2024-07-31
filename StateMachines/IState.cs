@@ -26,7 +26,7 @@ namespace Utils.StateMachines
 
 		private IStateMachine<K> _activeStateMachine;
 
-		public async Task Reload(IStateData<K> data)
+		public virtual async Task Reload(IStateData<K> data)
 		{
 			IStateMachine<K> machine = _activeStateMachine;
 			await Exit();
