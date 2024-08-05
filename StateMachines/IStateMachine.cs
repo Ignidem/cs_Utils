@@ -9,6 +9,7 @@ namespace Utils.StateMachines
 	public interface IStateMachine 
 	{
 		IState ActiveState { get; }
+		bool IsSwitching { get; }
 		event ExceptionHandlerDelegate OnException;
 		Task ExitActiveState();
 	}

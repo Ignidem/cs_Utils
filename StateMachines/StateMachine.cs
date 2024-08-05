@@ -8,6 +8,7 @@ namespace Utils.StateMachines
 	public class StateMachine<K> : IStateMachine<K>, IDisposable
 	{
 		public IState<K> ActiveState { get; protected set; }
+		public bool IsSwitching { get; private set; }
 		protected Dictionary<K, IState<K>> States;
 		public event StateChangeDelegate<K> OnStateChange;
 		public event ExceptionHandlerDelegate OnException;
@@ -52,14 +53,15 @@ namespace Utils.StateMachines
 
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
-			if (state == ActiveState)
-			{
-				await ActiveState.Reload(data);
-				return;
-			}
-
+			IsSwitching = true;
 			try
 			{
+				if (state == ActiveState)
+				{
+					await ActiveState.Reload(data);
+					return;
+				}
+
 				await state.Preload(data);
 
 				IState<K> oldState = ActiveState;
@@ -77,6 +79,10 @@ namespace Utils.StateMachines
 			catch (Exception e)
 			{
 				OnException?.Invoke(e);
+			}
+			finally
+			{
+				IsSwitching = false;
 			}
 		}
 
