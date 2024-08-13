@@ -53,23 +53,27 @@ namespace Utils.StateMachines
 
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
+			IState<K> oldState = ActiveState;
+			if (IsSwitching)
+				throw new Exception("StateMachine is already switching states!\n" +
+					$"From [{oldState}] To [{state}] with data [{data}]");
+
 			IsSwitching = true;
 			try
 			{
-				if (state == ActiveState)
+				if (state == oldState)
 				{
-					await ActiveState.Reload(data);
+					await oldState.Reload(data);
 					return;
 				}
 
 				await state.Preload(data);
 
-				IState<K> oldState = ActiveState;
 				if (oldState != null)
 					await oldState.Exit();
 
 				ActiveState = state;
-				await ActiveState.Enter(this);
+				await state.Enter(this);
 
 				if (oldState != null)
 					await oldState?.Cleanup();
