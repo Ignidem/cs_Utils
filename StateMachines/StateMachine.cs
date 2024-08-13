@@ -8,7 +8,7 @@ namespace Utils.StateMachines
 	public class StateMachine<K> : IStateMachine<K>, IDisposable
 	{
 		public IState<K> ActiveState { get; protected set; }
-		public bool IsSwitching { get; private set; }
+		public IStateMachine<K>.SwitchInfo ActiveSwitch { get; private set; }
 		protected Dictionary<K, IState<K>> States;
 		public event StateChangeDelegate<K> OnStateChange;
 		public event ExceptionHandlerDelegate OnException;
@@ -54,11 +54,12 @@ namespace Utils.StateMachines
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
 			IState<K> oldState = ActiveState;
-			if (IsSwitching)
+			if (ActiveSwitch.IsSwitching)
 				throw new Exception("StateMachine is already switching states!\n" +
-					$"From [{oldState}] To [{state}] with data [{data}]");
+					$"Called Switch: {nameof(SwitchState)}({state}, {data})\n" +
+					$"Active Switch: [{ActiveSwitch.oldState}] To [{ActiveSwitch.newState}] with data [{ActiveSwitch.newStateData}]");
 
-			IsSwitching = true;
+			ActiveSwitch = new IStateMachine<K>.SwitchInfo(ActiveState, state, data);
 			try
 			{
 				if (state == oldState)
@@ -86,7 +87,7 @@ namespace Utils.StateMachines
 			}
 			finally
 			{
-				IsSwitching = false;
+				ActiveSwitch = default;
 			}
 		}
 
