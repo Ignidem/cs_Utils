@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Utils.Logger;
 
 namespace Utils.StateMachines
 {
@@ -55,9 +56,14 @@ namespace Utils.StateMachines
 		{
 			IState<K> oldState = ActiveState;
 			if (ActiveSwitch.IsSwitching)
-				throw new Exception("StateMachine is already switching states!\n" +
+			{
+				Exception e = new Exception("StateMachine is already switching states!\n" +
 					$"Called Switch: {nameof(SwitchState)}({state}, {data})\n" +
 					$"Active Switch: [{ActiveSwitch.oldState}] To [{ActiveSwitch.newState}] with data [{ActiveSwitch.newStateData}]");
+
+				e.LogException();
+				throw e;
+			}
 
 			ActiveSwitch = new IStateMachine<K>.SwitchInfo(ActiveState, state, data);
 			try
