@@ -20,6 +20,9 @@ namespace Utils.Logger
 		public static void LogException(this Exception e) => Logger.Log(e);
 		public static async void LogException(this Task task)
 		{
+			if (task == null)
+				return;
+
 			try
 			{
 				await task;

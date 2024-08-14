@@ -47,6 +47,21 @@ namespace Utilities.Collections
 			return array;
 		}
 
+		public static T[] InsertElement<T>(this T[] array, T element, int index)
+		{
+			if (array == null)
+			{
+				array = new T[index + 1];
+			}
+			else if (index >= array.Length)
+			{
+				Array.Resize(ref array, index + 1);
+			}
+
+			array[index] = element;
+			return array;
+		}
+
 		public static T[] RemoveAt<T>(this T[] array, int index)
 		{
 			T[] dest = new T[array.Length - 1];
