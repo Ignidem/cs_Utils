@@ -1,10 +1,5 @@
 ﻿namespace Utils.Serializers.WritableObjects
 {
-	public interface IReader
-	{
-		T Read<T>();
-	}
-
 	public static class ReaderUtils
 	{
 		public static T[] ReadMany<T>(this IReader reader)
