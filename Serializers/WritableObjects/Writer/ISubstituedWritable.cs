@@ -1,7 +1,8 @@
 ﻿namespace Utils.Serializers.WritableObjects
 {
-	public interface ISubstituedWritable
+	public interface ISubstituedWritable<T>
+		where T : IWriter
 	{
-		IWritable Substitute { get; }
+		IWritable<T> Substitute { get; }
 	}
 }
