@@ -6,12 +6,13 @@ using Utils.Logger;
 
 namespace Utils.Serializers.WritableObjects.WritersSerializers
 {
-	public class Readable<T, TReader>
+	public class ReadableConstructors<T, TReader>
 		where TReader : IReader
 	{
 		public const string nullType = "__null";
 		public delegate T Constructor(TReader reader);
-		private static readonly Type[] argType = new Type[] { typeof(TReader) };
+		private static readonly Type[] mainArgTypes = new Type[] { typeof(TReader) };
+		private static readonly Type[] subArgTypes = new Type[] { typeof(IReader) };
 		private static readonly Dictionary<string, Constructor> constructors = CreateConstructors();
 
 		private static void LogError(string message)
@@ -72,22 +73,40 @@ namespace Utils.Serializers.WritableObjects.WritersSerializers
 					$"and requires the {nameof(ExcludeWritableAttribute)} attribute.");
 			}
 
-			Constructor expression = CreateConstructor(type);
-			if (expression != null)
+			try
+			{
+				Constructor expression = CreateConstructor(type);
 				constructors.Add(name, expression);
+			}
+			catch (Exception e)
+			{
+				e.LogException();
+			}
+		}
+		private static NewExpression GetTReaderConstructor(Type type, ParameterExpression param)
+		{
+			System.Reflection.ConstructorInfo cnt = type.GetConstructor(mainArgTypes);
+			if (cnt == null)
+				return null;
+
+			return Expression.New(cnt, param);
+		}
+		private static NewExpression GetIReaderConstructor(Type type, ParameterExpression param)
+		{
+			System.Reflection.ConstructorInfo cnt = type.GetConstructor(subArgTypes);
+			if (cnt == null)
+				return null;
+
+			UnaryExpression cast = Expression.Convert(param, subArgTypes[0]);
+			return Expression.New(cnt, cast);
 		}
 		private static Constructor CreateConstructor(Type type)
 		{
-			System.Reflection.ConstructorInfo cnt = type.GetConstructor(argType);
-			if (cnt == null)
-			{
-				Exception exception = new NullReferenceException($"{type.Name} has no reader constructor");
-				exception.LogException();
-				return null;
-			}
+			ParameterExpression param = Expression.Parameter(mainArgTypes[0]);
 
-			ParameterExpression param = Expression.Parameter(argType[0]);
-			NewExpression cntr = Expression.New(cnt, param);
+			NewExpression cntr = GetTReaderConstructor(type, param) ?? GetIReaderConstructor(type, param) ?? 
+				throw new NullReferenceException($"{type.Name} has no {typeof(T).Name} or {typeof(IReader).Name} reader constructor");
+
 			UnaryExpression convert = Expression.Convert(cntr, typeof(T));
 			Expression<Constructor> expression = Expression.Lambda<Constructor>(convert, param);
 			return expression.Compile();
