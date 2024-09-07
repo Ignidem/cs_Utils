@@ -1,4 +1,7 @@
-﻿namespace Utils.Serializers.WritableObjects.WritersSerializers
+﻿using System;
+using System.Collections.Generic;
+
+namespace Utils.Serializers.WritableObjects.WritersSerializers
 {
 	public interface IWritableSerializer<T, TReader, TWriter>
 		where T : IWritable<TWriter>

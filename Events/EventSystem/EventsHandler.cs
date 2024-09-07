@@ -7,58 +7,69 @@ namespace Utils.EventSystem
         private readonly Dictionary<TKey, IEventContainer> eventsContainers
 			= new Dictionary<TKey, IEventContainer>();
 
-		#region Action
+		#region Action		
+		protected virtual IActionContainer GetActionContainer(TKey key)
+		{
+			return GetContainer<ActionContainer>(key);
+		}
 		public void Invoke(TKey key)
 		{
-			EventContainer container = Get<EventContainer>(key);
+			IActionContainer container = GetActionContainer(key);
 			container?.InvokeEvent();
 		}
-		public void Add(TKey key, EventContainer.EventDelegate func)
+		public void Add(TKey key, IActionContainer.EventDelegate func)
 		{
-			EventContainer container = Get<EventContainer>(key);
+			IActionContainer container = GetActionContainer(key);
 			container?.Add(func);
 		}
-		public void Remove(TKey key, EventContainer.EventDelegate func)
+		public void Remove(TKey key, IActionContainer.EventDelegate func)
 		{
-			EventContainer container = Get<EventContainer>(key);
+			IActionContainer container = GetActionContainer(key);
 			container?.Remove(func);
 		}
 		#endregion
 
 		#region Action In
+		protected virtual IActionContainer<T> GetActionContainer<T>(TKey key)
+		{
+			return GetContainer<ActionContainer<T>>(key);
+		}
 		public void Invoke<T>(TKey key, T arg)
 		{
-			EventContainer<T> container = Get<EventContainer<T>>(key);
+			IActionContainer<T> container = GetActionContainer<T>(key);
 			container?.InvokeEvent(arg);
 		}
-		public void Add<T>(TKey key, EventContainer<T>.EventDelegate func)
+		public void Add<T>(TKey key, IActionContainer<T>.EventDelegate func)
 		{
-			EventContainer<T> container = Get<EventContainer<T>>(key);
+			IActionContainer<T> container = GetActionContainer<T>(key);
 			container?.Add(func);
 		}
-		public void Remove<T>(TKey key, EventContainer<T>.EventDelegate func)
+		public void Remove<T>(TKey key, IActionContainer<T>.EventDelegate func)
 		{
-			EventContainer<T> container = Get<EventContainer<T>>(key);
+			IActionContainer<T> container = GetActionContainer<T>(key);
 			container?.Remove(func);
 		}
 		#endregion
 
 		#region Func in out
+		protected virtual IFuncContainer<TReturn, TArgument> GetFuncContainer<TReturn, TArgument>(TKey key)
+		{
+			return GetContainer<FuncContainer<TReturn, TArgument>>(key);
+		}
 		public TReturn Invoke<TReturn, TArgument>(TKey key, TArgument arg)
         {
-            EventContainer<TReturn, TArgument> container = Get<EventContainer<TReturn, TArgument>>(key);
+            IFuncContainer<TReturn, TArgument> container = GetFuncContainer<TReturn, TArgument>(key);
             return container == null ? default : container.InvokeEvent(arg);
         }
-		public void Add<TSource, TArgument>(TKey key, EventContainer<TSource, TArgument>.EventDelegate func)
-        {
-			EventContainer<TSource, TArgument> container = Get<EventContainer<TSource, TArgument>>(key);
+		public void Add<TReturn, TArgument>(TKey key, IFuncContainer<TReturn, TArgument>.EventDelegate func)
+		{
+			IFuncContainer<TReturn, TArgument> container = GetFuncContainer<TReturn, TArgument>(key);
 			container?.Add(func);
         }
-
-        public void Remove<TSource, TArgument>(TKey key, EventContainer<TSource, TArgument>.EventDelegate func)
-        {
-            EventContainer<TSource, TArgument> container = Get<EventContainer<TSource, TArgument>>(key);
-            container?.Remove(func);
+        public void Remove<TReturn, TArgument>(TKey key, IFuncContainer<TReturn, TArgument>.EventDelegate func)
+		{
+			IFuncContainer<TReturn, TArgument> container = GetFuncContainer<TReturn, TArgument>(key);
+			container?.Remove(func);
         }
 		#endregion
 
@@ -70,7 +81,7 @@ namespace Utils.EventSystem
             }
         }
 
-        private T Get<T>(TKey key) 
+        protected T GetContainer<T>(TKey key) 
 			where T : IEventContainer, new()
 		{
             if (!eventsContainers.TryGetValue(key, out IEventContainer container))

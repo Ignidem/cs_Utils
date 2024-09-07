@@ -1,9 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Utils.Serializers.WritableObjects
 {
 	public static class WriterUtils
 	{
+		public static readonly Dictionary<Type, Action<IWriter, object>> enumReaders = new()
+		{
+			[typeof(sbyte)] = (writer, value) => writer.Write((sbyte)value),
+			[typeof(byte)] = (writer, value) => writer.Write((byte)value),
+			[typeof(short)] = (writer, value) => writer.Write((short)value),
+			[typeof(ushort)] = (writer, value) => writer.Write((ushort)value),
+			[typeof(int)] = (writer, value) => writer.Write((int)value),
+			[typeof(uint)] = (writer, value) => writer.Write((uint)value),
+			[typeof(long)] = (writer, value) => writer.Write((long)value),
+			[typeof(ulong)] = (writer, value) => writer.Write((ulong)value),
+		};
+
+		public static void WriteEnum<T>(this IWriter writer, T value)
+			where T : struct, Enum
+		{
+			Type underlying = Enum.GetUnderlyingType(typeof(T));
+			enumReaders[underlying](writer, value);
+		}
+
 		public static void WriteMany<T>(this IWriter writer, IList<T> values)
 		{
 			int count = values == null ? -1 : values.Count;
