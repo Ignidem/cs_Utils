@@ -8,9 +8,9 @@ namespace Utilities.Collections
 #nullable enable
 	public static class ArrayEx
 	{
-		public static int IndexOf<T>(this T[] array, Predicate<T> predicate)
+		public static int IndexOf<T>(this IReadOnlyList<T> array, Predicate<T> predicate)
 		{
-			for (int i = 0; i < array.Length; i++)
+			for (int i = 0; i < array.Count; i++)
 			{
 				T? element = array[i];
 

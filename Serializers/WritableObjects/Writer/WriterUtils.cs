@@ -24,7 +24,7 @@ namespace Utils.Serializers.WritableObjects
 			enumReaders[underlying](writer, value);
 		}
 
-		public static void WriteMany<T>(this IWriter writer, IList<T> values)
+		public static void WriteMany<T>(this IWriter writer, IReadOnlyList<T> values)
 		{
 			int count = values == null ? -1 : values.Count;
 			writer.Write(count);
