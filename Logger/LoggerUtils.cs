@@ -23,6 +23,15 @@ namespace Utils.Logger
 			if (task == null)
 				return;
 
+			if (task.IsFaulted)
+			{
+				task.Exception.LogException();
+				return;
+			}
+
+			if (task.IsCompleted || task.IsCanceled)
+				return;
+
 			try
 			{
 				await task;

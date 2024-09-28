@@ -10,7 +10,7 @@ namespace Utils.StateMachines
 	{
 		public IState<K> ActiveState { get; protected set; }
 		public IStateMachine<K>.SwitchInfo ActiveSwitch { get; private set; }
-		protected Dictionary<K, IState<K>> States;
+		protected readonly Dictionary<K, IState<K>> States;
 		public event StateChangeDelegate<K> OnStateChange;
 		public event ExceptionHandlerDelegate OnException;
 
@@ -19,11 +19,25 @@ namespace Utils.StateMachines
 			States = states.ToDictionary(state => state.Key, state => state);
 		}
 
+		public bool ContainsState(K key)
+		{
+			return States.ContainsKey(key);
+		}
+		public void AddOrReplaceState(IState<K> state)
+		{
+			States[state.Key] = state;
+		}
+
 		public virtual async Task SwitchState(IStateData<K> data)
 		{
 			K key = data.Key;
 			if (States.TryGetValue(key, out IState<K> state))
 				await SwitchState(state, data);
+		}
+
+		public virtual Task SwitchState(IState<K> state)
+		{
+			return SwitchState(state, null);
 		}
 
 		public virtual async Task SwitchState(K key)
