@@ -2,13 +2,14 @@
 
 namespace Utils.EventSystem
 {
-	public class EventHandler<TKey> : IEventHandler<TKey>
+	public class EventHandler<TKey> : IEventHandler<TKey>,
+		IActionEventHandler<TKey>, IArgActionEventHandler<TKey>, IFuncEventHandler<TKey>
 	{
         private readonly Dictionary<TKey, IEventContainer> eventsContainers
 			= new Dictionary<TKey, IEventContainer>();
 
 		#region Action		
-		protected virtual IActionContainer GetActionContainer(TKey key)
+		public virtual IActionContainer GetActionContainer(TKey key)
 		{
 			return GetContainer<ActionContainer>(key);
 		}
@@ -30,7 +31,7 @@ namespace Utils.EventSystem
 		#endregion
 
 		#region Action In
-		protected virtual IActionContainer<T> GetActionContainer<T>(TKey key)
+		public virtual IActionContainer<T> GetActionContainer<T>(TKey key)
 		{
 			return GetContainer<ActionContainer<T>>(key);
 		}
@@ -52,7 +53,7 @@ namespace Utils.EventSystem
 		#endregion
 
 		#region Func in out
-		protected virtual IFuncContainer<TReturn, TArgument> GetFuncContainer<TReturn, TArgument>(TKey key)
+		public virtual IFuncContainer<TReturn, TArgument> GetFuncContainer<TReturn, TArgument>(TKey key)
 		{
 			return GetContainer<FuncContainer<TReturn, TArgument>>(key);
 		}
@@ -81,7 +82,7 @@ namespace Utils.EventSystem
             }
         }
 
-        protected T GetContainer<T>(TKey key) 
+        public T GetContainer<T>(TKey key) 
 			where T : IEventContainer, new()
 		{
             if (!eventsContainers.TryGetValue(key, out IEventContainer container))
