@@ -77,7 +77,7 @@ namespace Utilities.Reflection
 				return map.TargetType;
 			}
 
-			if (targetType.IsGenericType && baseType.GetGenericTypeDefinition() == targetType)
+			if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == targetType)
 			{
 				return baseType;
 			}
