@@ -7,6 +7,7 @@ using Utils.Logger;
 namespace Utils.Serializers.WritableObjects.WritersSerializers
 {
 	public class ReadableConstructors<T, TReader>
+		where T : IWritable
 		where TReader : IReader
 	{
 		public const string nullType = "__null";
