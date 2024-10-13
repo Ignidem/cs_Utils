@@ -7,7 +7,7 @@
 
 	public interface IEventHandler<TKey> : IEventHandler
 	{
-		T GetContainer<T>(TKey key)
+		T GetContainer<T>(TKey key, bool create)
 			where T : IEventContainer, new();
 	}
 }
