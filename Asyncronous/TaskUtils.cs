@@ -5,6 +5,15 @@ namespace Utils.Asyncronous
 {
 	public static class TaskUtils
 	{
+		public static Task TaskOrCompleted(this Task task)
+		{
+			return task ?? Task.CompletedTask;
+		}
+		public static Task<T> TaskOrDefaultCompleted<T>(this Task<T> task)
+		{
+			return task ?? Task.FromResult<T>(default);
+		}
+
 		public static Task OnSuccess(this Task task, Action onSuccess)
 		{
 			AwaitSuccess(task, onSuccess);
