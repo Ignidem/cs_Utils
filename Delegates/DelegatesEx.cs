@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Utils.Delegates
 {
+#nullable disable
 	public static class DelegateEx
 	{
 		public static TDelegate ToDelegate<TDelegate>(this MethodInfo method, object instance = null)
@@ -59,5 +56,6 @@ namespace Utils.Delegates
 			}
 		}
 	}
+#nullable restore
 }
 
