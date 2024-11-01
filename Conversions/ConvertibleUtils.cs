@@ -2,6 +2,7 @@
 using System.Reflection;
 using Utilities.Reflection;
 using Newtonsoft.Json;
+using System;
 
 namespace Utilities.Conversions
 {

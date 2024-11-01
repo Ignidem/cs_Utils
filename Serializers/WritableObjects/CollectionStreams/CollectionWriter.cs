@@ -4,8 +4,8 @@ namespace Utils.Serializers.WritableObjects.CollectionStreams
 {
 	public class CollectionWriter : ICollectionWriter
 	{
-		public int Size => values.Count;
-		public int Capacity => values.Capacity;
+		public long Size => values.Count;
+		public long Capacity => values.Capacity;
 
 		private readonly List<object> values;
 

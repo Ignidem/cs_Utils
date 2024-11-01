@@ -8,9 +8,9 @@ namespace Utils.Serializers.WritableObjects.MemoryStreams
 {
 	public class MemoryWriter : IMemoryWriter, IMemoryReader
 	{
-		public int Size => throw new NotImplementedException();
+		public long Size => throw new NotImplementedException();
 
-		public int Capacity => stream.Capacity;
+		public long Capacity => stream.Capacity;
 
 		private readonly System.IO.MemoryStream stream;
 

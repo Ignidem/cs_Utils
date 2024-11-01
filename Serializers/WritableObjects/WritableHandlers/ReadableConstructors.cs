@@ -4,10 +4,9 @@ using System.Linq.Expressions;
 using Utilities.Reflection;
 using Utils.Logger;
 
-namespace Utils.Serializers.WritableObjects.WritersSerializers
+namespace Utils.Serializers.WritableObjects
 {
 	public class ReadableConstructors<T, TReader>
-		where T : IWritable
 		where TReader : IReader
 	{
 		public const string nullType = "__null";
