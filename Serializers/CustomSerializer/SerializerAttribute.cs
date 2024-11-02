@@ -37,9 +37,9 @@ namespace Utils.Serializers.CustomSerializers
 			private Dictionary<Type, SerializerAttribute> _serializers = new()
 			{
 				[typeof(Numbers.Vectors.VectorInt.Vector2)] = new SerializerAttribute(typeof(Vector2IntSerializer)),
-				[typeof(Vector3Int)] = new SerializerAttribute(typeof(Vector3IntSerializer)),
+				[typeof(Numbers.Vectors.VectorInt.Vector3)] = new SerializerAttribute(typeof(Vector3IntSerializer)),
 				[typeof(System.Numerics.Vector2)] = new SerializerAttribute(typeof(Vector2Serializer)),
-				[typeof(Vector3)] = new SerializerAttribute(typeof(Vector3Serializer)),
+				[typeof(System.Numerics.Vector3)] = new SerializerAttribute(typeof(Vector3Serializer)),
 				[typeof(Guid)] = new SerializerAttribute(typeof(GuidSerializer)),
 				[typeof(bool)] = new SerializerAttribute(typeof(BoolSerializer)),
 				[typeof(bool[])] = new SerializerAttribute(typeof(BoolListSerializer)),

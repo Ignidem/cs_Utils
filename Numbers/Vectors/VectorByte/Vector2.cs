@@ -8,7 +8,7 @@ using Utils.Serializers.WritableObjects;
 namespace Utils.Numbers.Vectors.VectorByte
 {
 	[Serializable]
-	public partial struct Vector2 : IWritable
+	public struct Vector2 : IWritable
 	{
 		public static readonly Vector2 one = new Vector2(1, 1);
 		public static readonly Vector2 zero = new Vector2();

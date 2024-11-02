@@ -34,6 +34,17 @@ namespace Utils.Serializers.WritableObjects
 				writer.Write(value);
 			}
 		}
+		public static void WriteManyAs<TValue, TResult>(this IWriter writer, 
+			IReadOnlyList<TValue> values, Func<TValue, TResult> converter)
+		{
+			int count = values == null ? -1 : values.Count;
+			writer.Write(count);
+			for (int i = 0; i < count; i++)
+			{
+				TResult value = converter(values[i]);
+				writer.Write(value);
+			}
+		}
 
 		public static void WriteArray<T>(this IWriter writer, T[,] values)
 		{

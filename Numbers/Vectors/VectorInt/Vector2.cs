@@ -52,7 +52,7 @@ namespace Utils.Numbers.Vectors.VectorInt
 		{
 			return obj is Vector2 v && this == v
 				||
-				obj is Vector3Int v3 && v3.z == 0 && x == v3.x && y == v3.y;
+				obj is Vector3 v3 && v3.z == 0 && x == v3.x && y == v3.y;
 		}
 		public readonly override int GetHashCode()
 		{

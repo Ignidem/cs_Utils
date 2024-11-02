@@ -40,6 +40,21 @@ namespace Utils.Serializers.WritableObjects
 			return values;
 		}
 
+		public static TResult[] ReadManyAs<TValue, TResult>(this IReader reader, Func<TValue, TResult> convert)
+		{
+			int count = reader.Read<int>();
+			if (count == -1)
+				return null;
+
+			TResult[] values = new TResult[count];
+			for (int i = 0; i < count; i++)
+			{
+				values[i] = convert(reader.Read<TValue>());
+			}
+
+			return values;
+		}
+
 		public static T[,] ReadArray<T>(this IReader reader)
 		{
 			int x = reader.Read<int>();

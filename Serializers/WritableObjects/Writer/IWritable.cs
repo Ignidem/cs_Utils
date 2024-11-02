@@ -16,6 +16,9 @@
 			Write(twriter);
 		}
 
-		void Write(TWriter writer);
+		void Write(TWriter writer)
+		{
+			throw new System.NotImplementedException(GetType().Name);
+		}
 	}
 }

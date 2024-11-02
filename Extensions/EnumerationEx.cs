@@ -27,7 +27,19 @@ namespace Utilities.Extensions
 
 		public static T? RandomElement<T>(this IList<T> list)
 			=> list == null || list.Count == 0 ? default : list[rand.Next(0, list.Count)];
-
+		public static IEnumerable<int> RandomIndexes<T>(this IReadOnlyList<T> list, int count)
+		{
+			count = Math.Min(count, list.Count);
+			IEnumerable<int> shuffled = list.Select((v, i) => i).OrderBy(u => Guid.NewGuid());
+			return count == list.Count ? shuffled : shuffled.Take(count);
+		}
+		public static IEnumerable<T> RandomElements<T>(this IReadOnlyList<T> list, int count)
+		{
+			foreach (int index in list.RandomIndexes(count))
+			{
+				yield return list[index];
+			}
+		}
 		public static T? RandomElement<T>(this IEnumerable<T> list)
 			=> list == null || !list.Any() ? default : list.ElementAt(rand.Next(0, list.Count()));
 
