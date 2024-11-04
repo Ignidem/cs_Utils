@@ -9,11 +9,13 @@ namespace Utilities.Extensions
 #nullable enable
 	public static class EnumerationEx
 	{
-		public readonly static Random rand = new(Guid.NewGuid().GetHashCode());
-
 		public static int RandomIndex(this IList list)
 		{
-			return rand.Next(0, list.Count);
+			return RandomIndex(list.Count);
+		}
+		public static int RandomIndex(int size)
+		{
+			return Numbers.RandomEx.Int(size);
 		}
 
 		public static (T?, V?) RandomElement<T, V>(this Dictionary<T, V> dict)
@@ -21,12 +23,13 @@ namespace Utilities.Extensions
 		{
 			if (dict == null || dict.Count == 0) return (default, default);
 
-			KeyValuePair<T, V> keypair = dict.ElementAt(rand.Next(0, dict.Count));
+			int index = RandomIndex(dict.Count);
+			KeyValuePair<T, V> keypair = dict.ElementAt(index);
 			return (keypair.Key, keypair.Value);
 		}
 
 		public static T? RandomElement<T>(this IList<T> list)
-			=> list == null || list.Count == 0 ? default : list[rand.Next(0, list.Count)];
+			=> list == null || list.Count == 0 ? default : list[RandomIndex(list.Count)];
 		public static IEnumerable<int> RandomIndexes<T>(this IReadOnlyList<T> list, int count)
 		{
 			count = Math.Min(count, list.Count);
@@ -41,22 +44,21 @@ namespace Utilities.Extensions
 			}
 		}
 		public static T? RandomElement<T>(this IEnumerable<T> list)
-			=> list == null || !list.Any() ? default : list.ElementAt(rand.Next(0, list.Count()));
+			=> list == null || !list.Any() ? default : list.ElementAt(RandomIndex(list.Count()));
 
 		public static T? RandomElement<T>(this T[] list) 
 			=> Random(list);
 
 		public static T? Random<T>(params T[] list)
-			=> list == null || list.Length == 0 ? default : list[rand.Next(0, list.Length)];
+			=> list == null || list.Length == 0 ? default : list[RandomIndex(list.Length)];
 
-		public static T? RandomElement<T>(Random? random = null) where T : Enum
+		public static T? RandomElement<T>(Random? random = null)
+			where T : Enum
 		{
-			random ??= rand;
-
 			T[]? list = EnumUtils.GetValues<T>();
 			if (list is null || list.Length == 0) return default;
 
-			int index = random.Next(0, list.Length);
+			int index = random?.Next(0, list.Length) ?? RandomIndex(list.Length);
 			return list[index];
 		}
 	}
