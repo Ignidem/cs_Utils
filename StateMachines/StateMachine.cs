@@ -11,6 +11,7 @@ namespace Utils.StateMachines
 		public IState<K> ActiveState { get; protected set; }
 		public IStateMachine<K>.SwitchInfo ActiveSwitch { get; private set; }
 		protected readonly Dictionary<K, IState<K>> States;
+
 		public event StateChangeDelegate<K> OnStateChange;
 		public event ExceptionHandlerDelegate OnException;
 

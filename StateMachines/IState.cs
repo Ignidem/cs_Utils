@@ -24,11 +24,11 @@ namespace Utils.StateMachines
 		public abstract K Key { get; }
 		public bool IsActive { get; private set; }
 
-		private IStateMachine<K> _activeStateMachine;
+		protected IStateMachine<K> StateMachine { get; private set; }
 
 		public virtual async Task Reload(IStateData<K> data)
 		{
-			IStateMachine<K> machine = _activeStateMachine;
+			IStateMachine<K> machine = StateMachine;
 			await Exit();
 			await Cleanup();
 			await Preload(data);
@@ -48,13 +48,13 @@ namespace Utils.StateMachines
 		{
 			IsActive = true;
 
-			if (_activeStateMachine != stateMachine && _activeStateMachine != null)
+			if (StateMachine != stateMachine && StateMachine != null)
 			{
 				throw new Exception(string.Format("State {0}<{1}> is already active in another state machine {2}",
-					GetType().Name, Key, _activeStateMachine.GetType().Name));
+					GetType().Name, Key, StateMachine.GetType().Name));
 			}
 
-			_activeStateMachine = stateMachine;
+			StateMachine = stateMachine;
 
 			return OnEnter();
 		}
@@ -68,7 +68,7 @@ namespace Utils.StateMachines
 		public Task Exit()
 		{
 			IsActive = false;
-			_activeStateMachine = null;
+			StateMachine = null;
 
 			return OnExit();
 		}
@@ -89,9 +89,9 @@ namespace Utils.StateMachines
 
 		protected async Task CloseState()
 		{
-			if (_activeStateMachine?.ActiveState == this)
+			if (StateMachine?.ActiveState == this)
 			{
-				await _activeStateMachine.ExitActiveState();
+				await StateMachine.ExitActiveState();
 			}
 			else
 			{
@@ -104,14 +104,14 @@ namespace Utils.StateMachines
 		{
 			if (!IsActive) return Task.CompletedTask;
 
-			return _activeStateMachine.SwitchState(data);
+			return StateMachine.SwitchState(data);
 		}
 
 		protected Task SwitchState(K key)
 		{
 			if (!IsActive) return Task.CompletedTask;
 
-			return _activeStateMachine.SwitchState(key);
+			return StateMachine.SwitchState(key);
 		}
 	}
 }

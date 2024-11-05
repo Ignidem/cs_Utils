@@ -36,6 +36,11 @@ namespace Utils.StateMachines
 		IState IStateMachine.ActiveState => ActiveState;
 		SwitchInfo ActiveSwitch { get; }
 		bool IStateMachine.IsSwitching => ActiveSwitch.IsSwitching;
+
+		/// <summary>
+		/// Invoked when the states switch cycle is complete. 
+		/// (After completely exiting previous state and fully entering next state.)
+		/// </summary>
 		event StateChangeDelegate<K> OnStateChange;
 		bool ContainsState(K key);
 		void AddOrReplaceState(IState<K> state);
