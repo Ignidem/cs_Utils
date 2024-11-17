@@ -33,14 +33,14 @@ namespace Utils.Serializers.WritableObjects
 				return;
 			}
 
-			Type type = value.GetType();
 			IWritable<TWriter> writable = value switch
 			{
 				ISubstituedWritable<TWriter> sub => sub.Substitute,
 				IWritable<TWriter> _writable => _writable,
-				_ => throw new Exception($"{type} is not {nameof(IWritable)}<{nameof(TWriter)}>")
+				_ => throw new Exception($"{value.GetType()} is not {nameof(IWritable)}<{nameof(TWriter)}>")
 			};
 
+			Type type = writable.GetType();
 			string name = GetName(type);
 			writer.Write(name);
 			writable.Write(writer);
