@@ -43,7 +43,7 @@ namespace Utils.EventSystem
 		public void Add<T>(TKey key, IActionContainer<T>.EventDelegate func)
 		{
 			IActionContainer<T> container = GetActionContainer<T>(key, true);
-			container?.Add(func);
+			container.Add(func);
 		}
 		public void Remove<T>(TKey key, IActionContainer<T>.EventDelegate func)
 		{

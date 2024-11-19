@@ -31,9 +31,9 @@ namespace Utils.Collections
 
 		public static T Pop<T>(this List<T> list)
 		{
-			return list.Pop(list.Count - 1);
+			return list.PopAt(list.Count - 1);
 		}
-		public static T Pop<T>(this List<T> list, int index)
+		public static T PopAt<T>(this List<T> list, int index)
 		{
 			T value = list[index];
 			list.RemoveAt(index);

@@ -20,6 +20,7 @@
 	}
     public class ActionContainer<TArgument> : IActionContainer<TArgument>
 	{
+		public int Count => Event?.GetInvocationList().Length ?? 0;
 		private event IActionContainer<TArgument>.EventDelegate Event;
 
         public void CleanInstance(object target)
