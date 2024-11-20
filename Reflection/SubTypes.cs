@@ -6,7 +6,6 @@ using Utilities.Collections;
 
 namespace Utilities.Reflection
 {
-#nullable enable
 	public static class SubTypes
     {
         private static readonly Dictionary<Type, Type[]> subTypes = new Dictionary<Type, Type[]>();
@@ -22,10 +21,14 @@ namespace Utilities.Reflection
         }
 
         public static IEnumerable<Type> GetImplementations(this Type type, params Assembly[] assemblies)
+		{
+			bool isEmpty = assemblies == null || assemblies.Length == 0;
+			IEnumerable<Assembly> assembliesCollection = isEmpty ? null : assemblies;
+			return GetImplementations(type, assembliesCollection);
+		}
+        public static IEnumerable<Type> GetImplementations(this Type type, IEnumerable<Assembly> assemblies)
         {
-			if (assemblies == null || assemblies.Length == 0)
-				assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
+			assemblies ??= AppDomain.CurrentDomain.GetAssemblies();
 			return assemblies.SelectMany(a => a.GetTypes().Where(t =>
                 !t.IsInterface && !t.IsAbstract
                 && (t == type || t.Inherits(type)))

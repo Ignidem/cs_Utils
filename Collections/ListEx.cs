@@ -79,6 +79,16 @@ namespace Utils.Collections
 			return false;
 		}
 
+		public static void SetAtOrAdd<T>(this List<T> list, int index, T value)
+		{
+			if (index < 0)
+				throw new IndexOutOfRangeException();
+
+			if (index >= list.Count)
+				list.Add(value);
+			else list[index] = value;
+		}
+
 		public static int IndexOf<T>(this IReadOnlyList<T> self, T target)
 		{
 			for (int i = 0; i < self.Count; i++)
