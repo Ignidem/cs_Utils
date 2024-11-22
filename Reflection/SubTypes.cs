@@ -12,7 +12,7 @@ namespace Utilities.Reflection
 
         public static Type[] GetSubTypes(this Type type)
         {
-            if (subTypes.TryGetValue(type, out Type[]? types)) 
+            if (subTypes.TryGetValue(type, out Type[] types)) 
                 return types;
 
             types = type.GetImplementations().ToArray();
