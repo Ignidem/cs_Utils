@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Utilities.Collections
 {
-#nullable enable
 	public static class ReadOnlyListEx
 	{
 		public static bool Contains<T>(this IReadOnlyList<T> list, T item)
@@ -72,6 +71,17 @@ namespace Utilities.Collections
 			}
 
 			return arr;
+		}
+		public static bool TryGetAt<T>(this IReadOnlyList<T> list, int index, out T item)
+		{
+			if (index < 0 || index >= list.Count)
+			{
+				item = default;
+				return false;
+			}
+
+			item = list[index];
+			return true;
 		}
 	}
 }
