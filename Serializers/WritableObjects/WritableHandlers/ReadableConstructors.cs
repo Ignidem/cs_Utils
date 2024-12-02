@@ -125,7 +125,7 @@ namespace Utils.Serializers.WritableObjects
 
 			if (!constructors.TryGetValue(name, out Constructor cnt))
 			{
-				string message = $"{typeof(T).Name}.{name} is invalid or has no network reader constructor!";
+				string message = $"{typeof(T).Name}.{name} is invalid or has no {typeof(TReader)} reader constructor!";
 				throw new Exception(message);
 			}
 
