@@ -69,7 +69,6 @@ namespace Utils.StateMachines
 
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
-			IState<K> oldState = ActiveState;
 			if (ActiveSwitch.IsSwitching)
 			{
 				Exception e = new Exception("StateMachine is already switching states!\n" +
@@ -80,27 +79,11 @@ namespace Utils.StateMachines
 				throw e;
 			}
 
-			ActiveSwitch = new IStateMachine<K>.SwitchInfo(ActiveState, state, data);
 			try
 			{
-				if (state == oldState)
-				{
-					await oldState.Reload(data);
-					return;
-				}
-
-				await state.Preload(data);
-
-				if (oldState != null)
-					await oldState.Exit();
-
-				ActiveState = state;
-				await state.Enter(this);
-
-				if (oldState != null)
-					await oldState?.Cleanup();
-
-				OnStateChange?.Invoke(oldState, state);
+				Task switchTask = PerformSwitch(state, data);
+				ActiveSwitch = new IStateMachine<K>.SwitchInfo(ActiveState, state, data, switchTask);
+				await switchTask;
 			}
 			catch (Exception e)
 			{
@@ -110,6 +93,28 @@ namespace Utils.StateMachines
 			{
 				ActiveSwitch = default;
 			}
+		}
+		private async Task PerformSwitch(IState<K> state, IStateData<K> data)
+		{
+			IState<K> oldState = ActiveState;
+			if (state == oldState)
+			{
+				await oldState.Reload(data);
+				return;
+			}
+
+			await state.Preload(data);
+
+			if (oldState != null)
+				await oldState.Exit();
+
+			ActiveState = state;
+			await state.Enter(this);
+
+			if (oldState != null)
+				await oldState?.Cleanup();
+
+			OnStateChange?.Invoke(oldState, state);
 		}
 
 		public virtual void Dispose()

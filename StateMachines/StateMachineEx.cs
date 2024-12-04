@@ -1,11 +1,19 @@
-﻿namespace Utils.StateMachines
+﻿using System.Threading.Tasks;
+
+namespace Utils.StateMachines
 {
 	public static class StateMachineEx
 	{
 		public static bool IsSwitchingTo<K>(this IStateMachine<K> stateMachine, K key)
 		{
-			var info = stateMachine.ActiveSwitch;
+			IStateMachine<K>.SwitchInfo info = stateMachine.ActiveSwitch;
 			return info.IsSwitching && info.newState.Key.Equals(key);
+		}
+
+		public static async Task AwaitSwitch(this IStateMachine machine)
+		{
+			while (machine.IsSwitching)
+				await Task.Yield();
 		}
 
 		public static bool TryActiveStateAs<T>(this IStateMachine stateMachine, out T state)

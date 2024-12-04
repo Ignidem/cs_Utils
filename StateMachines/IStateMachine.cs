@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Utils.StateMachines
@@ -23,12 +24,19 @@ namespace Utils.StateMachines
 			public readonly IState<K> oldState;
 			public readonly IState<K> newState;
 			public readonly IStateData<K> newStateData;
+			private readonly Task task;
 
-			public SwitchInfo(IState<K> oldState, IState<K> newState, IStateData<K> newStateData)
+			public SwitchInfo(IState<K> oldState, IState<K> newState, IStateData<K> newStateData, Task task)
 			{
 				this.oldState = oldState;
 				this.newState = newState;
 				this.newStateData = newStateData;
+				this.task = task;
+			}
+
+			public TaskAwaiter GetAwaiter()
+			{
+				return (task ?? Task.CompletedTask).GetAwaiter();
 			}
 		}
 
