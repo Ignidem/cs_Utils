@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Utils.Logger;
 
@@ -8,16 +9,30 @@ namespace Utils.StateMachines
 {
 	public class StateMachine<K> : IStateMachine<K>, IDisposable
 	{
-		public IState<K> ActiveState { get; protected set; }
-		public IStateMachine<K>.SwitchInfo ActiveSwitch { get; private set; }
-		protected readonly Dictionary<K, IState<K>> States;
+		public IState<K> ActiveState => lastTransition?.ActiveState;
+		public IState<K> NextState => lastTransition?.state;
+
+		public bool IsTransitioning => transitionTask != null && !transitionTask.IsCompleted;
 
 		public event StateChangeDelegate<K> OnStateChange;
+		public event TransitionDelegate OnTransition;
 		public event ExceptionHandlerDelegate OnException;
+
+		protected readonly Dictionary<K, IState<K>> States;
+		protected TransitionInfo<K> lastTransition;
+		protected Task transitionTask;
 
 		public StateMachine(IEnumerable<IState<K>> states)
 		{
 			States = states.ToDictionary(state => state.Key, state => state);
+		}
+		public virtual void Dispose()
+		{
+			foreach (IState<K> state in States.Values)
+			{
+				if (state is IDisposable disp)
+					disp.Dispose();
+			}
 		}
 
 		public bool ContainsState(K key)
@@ -35,12 +50,10 @@ namespace Utils.StateMachines
 			if (States.TryGetValue(key, out IState<K> state))
 				await SwitchState(state, data);
 		}
-
 		public virtual Task SwitchState(IState<K> state)
 		{
 			return SwitchState(state, null);
 		}
-
 		public virtual async Task SwitchState(K key)
 		{
 			if (States.TryGetValue(key, out IState<K> state))
@@ -60,69 +73,72 @@ namespace Utils.StateMachines
 			{
 				OnException(e);
 			}
-
-			ActiveState = null;
 		}
 
-		protected void StateChanged(IState<K> state) => OnStateChange(ActiveState, state);
-		protected void ExceptionCaught(Exception e) => OnException(e);
+		protected void StateChanged(IState<K> state) => OnStateChange?.Invoke(ActiveState, state);
+		protected void ExceptionCaught(Exception e) => OnException?.Invoke(e);
+		protected void TransitionChanged(TransitionType type) => OnTransition?.Invoke(type);
 
+		protected bool CheckPendingTransition()
+		{
+			if (!IsTransitioning)
+				return false;
+
+			Exception exception = lastTransition.GetTransitionException();
+			exception.LogException();
+			OnException.Invoke(exception);
+			return true;
+		}
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
 		{
-			if (ActiveSwitch.IsSwitching)
-			{
-				Exception e = new Exception("StateMachine is already switching states!\n" +
-					$"Called Switch: {nameof(SwitchState)}({state}, {data})\n" +
-					$"Active Switch: [{ActiveSwitch.oldState}] To [{ActiveSwitch.newState}] with data [{ActiveSwitch.newStateData}]");
+			if (CheckPendingTransition())
+				return;
 
-				e.LogException();
-				throw e;
+			if (state == null)
+			{
+				await ExitActiveState();
+				return;
 			}
 
 			try
 			{
-				Task switchTask = PerformSwitch(state, data);
-				ActiveSwitch = new IStateMachine<K>.SwitchInfo(ActiveState, state, data, switchTask);
-				await switchTask;
+				IState<K> exitingState = ActiveState;
+				if (state == exitingState)
+				{
+					await exitingState.Reload(data);
+					return;
+				}
+
+				lastTransition = new TransitionInfo<K>(exitingState, state, data);
+				await (transitionTask = HandleTransition(state, data));
+				OnStateChange?.Invoke(exitingState, state);
 			}
 			catch (Exception e)
 			{
 				OnException?.Invoke(e);
 			}
-			finally
-			{
-				ActiveSwitch = default;
-			}
 		}
-		private async Task PerformSwitch(IState<K> state, IStateData<K> data)
+		public TaskAwaiter GetAwaiter() => (transitionTask ?? Task.CompletedTask).GetAwaiter();
+		protected virtual async Task HandleTransition(IState<K> enteringState, IStateData<K> data)
 		{
-			IState<K> oldState = ActiveState;
-			if (state == oldState)
+			var exitingState = ActiveState;
+			OnTransition?.Invoke(TransitionType.Preload);
+			await enteringState.Preload(data);
+
+			if (exitingState != null)
 			{
-				await oldState.Reload(data);
-				return;
+				OnTransition?.Invoke(TransitionType.Exit);
+				await exitingState.Exit();
 			}
 
-			await state.Preload(data);
+			OnTransition?.Invoke(TransitionType.Enter);
+			await enteringState.Enter(this);
+			lastTransition.OnEnter();
 
-			if (oldState != null)
-				await oldState.Exit();
-
-			ActiveState = state;
-			await state.Enter(this);
-
-			if (oldState != null)
-				await oldState?.Cleanup();
-
-			OnStateChange?.Invoke(oldState, state);
-		}
-
-		public virtual void Dispose()
-		{
-			foreach (IState<K> state in States.Values)
+			if (exitingState != null)
 			{
-				if (state is IDisposable disp)
-					disp.Dispose();
+				OnTransition?.Invoke(TransitionType.Cleanup);
+				await exitingState?.Cleanup();
 			}
 		}
 	}

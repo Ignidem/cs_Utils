@@ -5,51 +5,30 @@ using System.Threading.Tasks;
 namespace Utils.StateMachines
 {
 	public delegate void StateChangeDelegate<K>(IState<K> current, IState<K> next);
+	public delegate void TransitionDelegate(TransitionType type);
 	public delegate void ExceptionHandlerDelegate(Exception exception);
 	
 	public interface IStateMachine 
 	{
 		IState ActiveState { get; }
-		bool IsSwitching { get; }
+		bool IsTransitioning { get; }
 		event ExceptionHandlerDelegate OnException;
 		Task ExitActiveState();
+		TaskAwaiter GetAwaiter();
 	}
 
-	public interface IStateMachine<K> : IStateMachine
+	public partial interface IStateMachine<K> : IStateMachine
 	{
-		public readonly struct SwitchInfo
-		{
-			public bool IsSwitching => newState != null;
-
-			public readonly IState<K> oldState;
-			public readonly IState<K> newState;
-			public readonly IStateData<K> newStateData;
-			private readonly Task task;
-
-			public SwitchInfo(IState<K> oldState, IState<K> newState, IStateData<K> newStateData, Task task)
-			{
-				this.oldState = oldState;
-				this.newState = newState;
-				this.newStateData = newStateData;
-				this.task = task;
-			}
-
-			public TaskAwaiter GetAwaiter()
-			{
-				return (task ?? Task.CompletedTask).GetAwaiter();
-			}
-		}
-
 		new IState<K> ActiveState { get; }
+		IState<K> NextState { get; }
 		IState IStateMachine.ActiveState => ActiveState;
-		SwitchInfo ActiveSwitch { get; }
-		bool IStateMachine.IsSwitching => ActiveSwitch.IsSwitching;
 
 		/// <summary>
 		/// Invoked when the states switch cycle is complete. 
 		/// (After completely exiting previous state and fully entering next state.)
 		/// </summary>
 		event StateChangeDelegate<K> OnStateChange;
+		event TransitionDelegate OnTransition;
 		bool ContainsState(K key);
 		void AddOrReplaceState(IState<K> state);
 		Task SwitchState(IState<K> state);

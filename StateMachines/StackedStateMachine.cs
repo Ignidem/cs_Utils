@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utils.Collections;
+using Utils.Logger;
 using Utils.StateMachines;
 
 namespace Utils.StateMachines
@@ -33,11 +34,12 @@ namespace Utils.StateMachines
 		{
 			try
 			{
-				if (ActiveState != null)
+				IState<K> activeState = ActiveState;
+				if (activeState != null)
 				{
-					await ActiveState.Exit();
-					await ActiveState.Cleanup();
-					if (ActiveState is IStackableState stackable)
+					await activeState.Exit();
+					await activeState.Cleanup();
+					if (activeState is IStackableState stackable)
 						await stackable.OnDestacked(stack.Count);
 				}
 			}
@@ -76,63 +78,72 @@ namespace Utils.StateMachines
 			return SwitchState(state, data, doStack);
 		}
 
-		public async Task SwitchState(IState<K> state, IStateData<K> data = null, bool doStack = true)
+		public async Task SwitchState(IState<K> state, IStateData<K> data, bool doStack = true)
 		{
+
+			if (CheckPendingTransition())
+				return;
+
 			if (state == null)
 			{
 				await ExitActiveState();
 				return;
 			}
 
-			IState<K> oldState = ActiveState;
-			bool hadState = oldState != null;
-			if (hadState && oldState.Key.Equals(state.Key))
-			{
-				try
-				{
-					await oldState.Reload(data);
-				}
-				catch (Exception e)
-				{
-					ExceptionCaught(e);
-				}
-
-				return;
-			}
-
-			bool isStackable = true;
-			if (oldState is not IStackableState stackable)
-			{
-				isStackable = false;
-				stackable = null;
-			}
-
 			try
 			{
-				await state.Preload(data);
+				IState<K> exitingState = ActiveState;
+				if (exitingState != null && exitingState.Key.Equals(state.Key))
+				{
+					await exitingState.Reload(data);
+					return;
+				}
 
-				if (doStack && oldState != null)
-					stack.Add(oldState);
-
-				if (hadState)
-					await oldState.Exit();
-
-				if (doStack && isStackable) 
-					await stackable.OnStacked(stack.Count - 1);
-
-				ActiveState = state;
-				await state.Enter(this);
-
-				if (hadState)
-					await oldState.Cleanup();
-
-				if (!doStack && isStackable) 
-					await stackable?.OnDestacked(stack.Count);
+				lastTransition = new TransitionInfo<K>(exitingState, state, data);
+				await (transitionTask = HandleTransition(state, data, doStack));
 			}
 			catch (Exception e)
 			{
 				ExceptionCaught(e);
 			}
+		}
+
+		private async Task HandleTransition(IState<K> state, IStateData<K> data, bool doStack)
+		{
+			IState<K> exitingState = ActiveState;
+			bool isStackable = true;
+			if (state is not IStackableState stackable)
+			{
+				isStackable = false;
+				stackable = null;
+			}
+
+			TransitionChanged(TransitionType.Preload);
+			await state.Preload(data);
+
+			if (doStack && state != null)
+				stack.Add(state);
+
+			if (exitingState != null)
+			{
+				TransitionChanged(TransitionType.Exit);
+				await exitingState.Exit();
+			}
+
+			if (doStack && isStackable)
+				await stackable.OnStacked(stack.Count - 1);
+
+			TransitionChanged(TransitionType.Enter);
+			await state.Enter(this);
+
+			if (exitingState != null)
+			{
+				TransitionChanged(TransitionType.Cleanup);
+				await exitingState.Cleanup();
+			}
+
+			if (!doStack && isStackable)
+				await stackable?.OnDestacked(stack.Count);
 		}
 
 		public async Task JumpState(K key)

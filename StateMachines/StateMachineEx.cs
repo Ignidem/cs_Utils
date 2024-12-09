@@ -6,13 +6,14 @@ namespace Utils.StateMachines
 	{
 		public static bool IsSwitchingTo<K>(this IStateMachine<K> stateMachine, K key)
 		{
-			IStateMachine<K>.SwitchInfo info = stateMachine.ActiveSwitch;
-			return info.IsSwitching && info.newState.Key.Equals(key);
+			return stateMachine.IsTransitioning && stateMachine.NextState.IsKey(key);
 		}
+
+		public static bool IsKey<K>(this IState<K> state, K key) => state.Key.Equals(key);
 
 		public static async Task AwaitSwitch(this IStateMachine machine)
 		{
-			while (machine.IsSwitching)
+			while (machine.IsTransitioning)
 				await Task.Yield();
 		}
 
