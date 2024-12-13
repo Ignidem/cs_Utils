@@ -62,12 +62,13 @@ namespace Utils.StateMachines
 
 		public virtual async Task ExitActiveState()
 		{
-			if (ActiveState == null) return;
-
 			try
 			{
-				await ActiveState.Exit();
-				await ActiveState.Cleanup();
+				IState<K> state = ActiveState;
+				if (state == null) return;
+
+				await state.Exit();
+				await state.Cleanup();
 			}
 			catch (Exception e)
 			{

@@ -7,7 +7,8 @@ using Utils.StateMachines;
 
 namespace Utils.StateMachines
 {
-	public interface IStackableState
+	public interface IStackableState<K> : IStackableState, IState<K> { }
+	public interface IStackableState : IState
 	{
 		/// <summary>
 		/// State has Exited and was stacked.
@@ -111,18 +112,15 @@ namespace Utils.StateMachines
 		private async Task HandleTransition(IState<K> state, IStateData<K> data, bool doStack)
 		{
 			IState<K> exitingState = ActiveState;
-			bool isStackable = true;
-			if (state is not IStackableState stackable)
-			{
-				isStackable = false;
+			//We are stacking the previous state to enable returning to it.
+			if (exitingState is not IStackableState<K> stackable)
 				stackable = null;
-			}
 
 			TransitionChanged(TransitionType.Preload);
 			await state.Preload(data);
 
-			if (doStack && state != null)
-				stack.Add(state);
+			if (doStack && stackable != null)
+				stack.Add(stackable);
 
 			if (exitingState != null)
 			{
@@ -130,11 +128,12 @@ namespace Utils.StateMachines
 				await exitingState.Exit();
 			}
 
-			if (doStack && isStackable)
+			if (doStack && stackable != null)
 				await stackable.OnStacked(stack.Count - 1);
 
 			TransitionChanged(TransitionType.Enter);
 			await state.Enter(this);
+			lastTransition.OnEnter();
 
 			if (exitingState != null)
 			{
@@ -142,8 +141,8 @@ namespace Utils.StateMachines
 				await exitingState.Cleanup();
 			}
 
-			if (!doStack && isStackable)
-				await stackable?.OnDestacked(stack.Count);
+			if (!doStack && stackable != null)
+				await stackable.OnDestacked(stack.Count);
 		}
 
 		public async Task JumpState(K key)
