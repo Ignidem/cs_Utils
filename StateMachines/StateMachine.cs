@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Utils.Asyncronous;
 using Utils.Logger;
 
 namespace Utils.StateMachines
@@ -67,8 +68,8 @@ namespace Utils.StateMachines
 				IState<K> state = ActiveState;
 				if (state == null) return;
 
-				await state.Exit();
-				await state.Cleanup();
+				await state?.Exit().TaskOrCompleted();
+				await state?.Cleanup().TaskOrCompleted();
 			}
 			catch (Exception e)
 			{
