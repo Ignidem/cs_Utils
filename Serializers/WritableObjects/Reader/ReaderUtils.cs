@@ -28,8 +28,10 @@ namespace Utils.Serializers.WritableObjects
 		public static T[] ReadMany<T>(this IReader reader)
 		{
 			int count = reader.Read<int>();
-			if (count == -1)
+			if (count <= -1)
 				return null;
+			else if (count == 0)
+				return Array.Empty<T>();
 
 			T[] values = new T[count];
 			for (int i = 0; i < count; i++)
@@ -48,7 +50,7 @@ namespace Utils.Serializers.WritableObjects
 			List<T> values = new List<T>(count);
 			for (int i = 0; i < count; i++)
 			{
-				values[i] = reader.Read<T>();
+				values.Add(reader.Read<T>());
 			}
 
 			return values;

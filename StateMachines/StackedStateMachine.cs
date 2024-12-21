@@ -81,7 +81,6 @@ namespace Utils.StateMachines
 
 		public async Task SwitchState(IState<K> state, IStateData<K> data, bool doStack = true)
 		{
-
 			if (CheckPendingTransition())
 				return;
 
@@ -101,7 +100,8 @@ namespace Utils.StateMachines
 				}
 
 				lastTransition = new TransitionInfo<K>(exitingState, state, data);
-				await (transitionTask = HandleTransition(state, data, doStack));
+				transitionTask = HandleTransition(state, data, doStack);
+				await transitionTask;
 			}
 			catch (Exception e)
 			{

@@ -2,19 +2,15 @@
 
 namespace Utils.Results
 {
-	public interface IResult
-	{
-		string Message { get; }
-		bool HasMessage { get; }
-		bool IsSuccess { get; }
-	}
-
-	public readonly struct Result<T> : IResult
+	public readonly struct Result<T> : IResult<T>
 	{
 		public static implicit operator Result<T>(T result) => new Result<T>(result);
 		public static implicit operator Result<T>(string message) => new Result<T>(message);
 		public static implicit operator bool(Result<T> result) => result.IsSuccess;
-		public static implicit operator T(Result<T> result) => result.IsSuccess ? result.value : default;
+		public static implicit operator T(Result<T> result) => result.value;
+
+		public static implicit operator Result(Result<T> result) => new Result(result.IsSuccess, result.Message);
+		public static implicit operator Result<T>(Result result) => new Result<T>(result.Message);
 
 		public static bool operator true(Result<T> result) => result.IsSuccess;
 		public static bool operator false(Result<T> result) => !result.IsSuccess;
@@ -28,7 +24,7 @@ namespace Utils.Results
 			return Task.FromResult(result);
 		}
 
-		private readonly T value;
+		public readonly T value;
 		public bool IsSuccess { get; }
 		public string Message { get; }
 		public bool HasMessage => !string.IsNullOrEmpty(Message);

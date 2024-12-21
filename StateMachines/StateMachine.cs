@@ -112,7 +112,8 @@ namespace Utils.StateMachines
 				}
 
 				lastTransition = new TransitionInfo<K>(exitingState, state, data);
-				await (transitionTask = HandleTransition(state, data));
+				transitionTask = HandleTransition(state, data);
+				await transitionTask;
 				OnStateChange?.Invoke(exitingState, state);
 			}
 			catch (Exception e)
