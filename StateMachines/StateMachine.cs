@@ -66,10 +66,21 @@ namespace Utils.StateMachines
 			try
 			{
 				IState<K> state = ActiveState;
-				if (state == null) return;
+				if (state == null)
+				{
+					lastTransition = null;
+					transitionTask = null;
+					return;
+				}
 
-				await state?.Exit().TaskOrCompleted();
-				await state?.Cleanup().TaskOrCompleted();
+				static async Task Exit(IState<K> state)
+				{
+					await state.Exit();
+					await state.Cleanup();
+				}
+
+				lastTransition = new TransitionInfo<K>(state, null, null);
+				await (transitionTask = Exit(state));
 			}
 			catch (Exception e)
 			{
@@ -124,14 +135,15 @@ namespace Utils.StateMachines
 		public TaskAwaiter GetAwaiter() => (transitionTask ?? Task.CompletedTask).GetAwaiter();
 		protected virtual async Task HandleTransition(IState<K> enteringState, IStateData<K> data)
 		{
-			var exitingState = ActiveState;
+			IState<K> exitingState = ActiveState;
 			OnTransition?.Invoke(TransitionType.Preload);
 			await enteringState.Preload(data);
 
 			if (exitingState != null)
 			{
 				OnTransition?.Invoke(TransitionType.Exit);
-				await exitingState.Exit();
+				Task exitTask = exitingState.Exit();
+				await exitTask;
 			}
 
 			OnTransition?.Invoke(TransitionType.Enter);
