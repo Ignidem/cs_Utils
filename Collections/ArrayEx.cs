@@ -8,18 +8,6 @@ namespace Utilities.Collections
 #nullable enable
 	public static class ArrayEx
 	{
-		public static int IndexOf<T>(this IReadOnlyList<T> array, Predicate<T> predicate)
-		{
-			for (int i = 0; i < array.Count; i++)
-			{
-				T? element = array[i];
-
-				if (predicate(element)) return i;
-			}
-
-			return -1;
-		}
-
 		public static bool TryIndexOf<T>(this T[] array, Predicate<T> predicate, out int index)
 		{
 			for (int i = 0; i < array.Length; i++)

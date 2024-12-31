@@ -23,6 +23,21 @@ namespace Utilities.Collections
 
 			return false;
 		}
+		public static int IndexOf<T>(this IReadOnlyList<T> self, T value)
+		{
+			return self.IndexOf(v => v.Equals(value));
+		}
+		public static int IndexOf<T>(this IReadOnlyList<T> self, Predicate<T> predicate)
+		{
+			for (int i = 0; i < self.Count; i++)
+			{
+				T element = self[i];
+				if (predicate(element))
+					return i;
+			}
+
+			return -1;
+		}
 		public static IReadOnlyList<T> Add<T>(this IReadOnlyList<T> list, T item)
 		{
 			T[] arr = new T[list.Count + 1];

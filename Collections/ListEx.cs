@@ -88,29 +88,5 @@ namespace Utils.Collections
 				list.Add(value);
 			else list[index] = value;
 		}
-
-		public static int IndexOf<T>(this IReadOnlyList<T> self, T target)
-		{
-			for (int i = 0; i < self.Count; i++)
-			{
-				T element = self[i];
-				if (Equals(element, target))
-					return i;
-			}
-
-			return -1;
-		}
-
-		public static int IndexOf<T>(this IReadOnlyList<T> self, Predicate<T> predicate)
-		{
-			for (int i = 0; i < self.Count; i++)
-			{
-				T element = self[i];
-				if (predicate(element))
-					return i;
-			}
-
-			return -1;
-		}
 	}
 }
