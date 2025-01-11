@@ -7,10 +7,10 @@ namespace Utilities.Numbers
     {
 		public static byte[] Bytes(int length) 
 		{
-			using (var rng = RandomNumberGenerator.Create())
+			using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
 			{
 				byte[] result = new byte[length];
-				rng.GetBytes(result, 0, length);
+				rng.GetBytes(result);
 				return result;
 			}
 		}
@@ -20,11 +20,11 @@ namespace Utilities.Numbers
 		{
 			return RandomNumberGenerator.GetInt32(min, exclusiveMax);
 		}
-		public static float Float(int inclusiveMax) => Float(0, inclusiveMax);
+		public static float Float(float inclusiveMax) => Float(0, inclusiveMax);
 		public static float Float(float min, float inclusiveMax)
 		{
-			float value = Convert.ToSingle(Bytes(4));
-			return value.Remap(0, 1, min, inclusiveMax);
+			float value = BitConverter.ToSingle(Bytes(sizeof(float)));
+			return value.Remap(float.MinValue, float.MaxValue, min, inclusiveMax);
 		}
 
 		public static bool Chance(int chance) 
