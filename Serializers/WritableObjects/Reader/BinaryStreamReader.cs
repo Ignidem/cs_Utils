@@ -1,11 +1,13 @@
-﻿using System.IO;
-
-namespace Utils.Serializers.WritableObjects.Reader
+﻿namespace Utils.Serializers.WritableObjects.Reader
 {
-	public class BinaryStreamReader : IReader
+	public abstract class BinaryStreamReader<TReader, TWriter> : IReader
+		where TReader : IReader
+		where TWriter : IWriter
 	{
-		private readonly Stream stream;
-		private readonly BinaryReader reader;
+		private static readonly Dictionary<Type, Delegate> readerFunctions = new();
+
+		protected readonly Stream stream;
+		protected readonly BinaryReader reader;
 
 		public BinaryStreamReader(Stream stream) 
 		{
@@ -13,15 +15,26 @@ namespace Utils.Serializers.WritableObjects.Reader
 			this.stream = stream;
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			reader.Dispose();
 			stream.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
-		public T Read<T>()
+		public virtual T Read<T>()
 		{
-			throw new System.NotImplementedException();
+			if (this.reader.TryRead(out T value))
+				return value;
+
+			Func<TReader, T> saveRead = GenericWritable<TReader, TWriter>.GetReader<T>();
+			readerFunctions[typeof(T)] = saveRead;
+			if (this is not TReader reader)
+			{
+				throw new Exception("Invalid Reader Type");
+			}
+
+			return saveRead(reader);
 		}
 	}
 }
