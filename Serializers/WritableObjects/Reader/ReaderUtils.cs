@@ -1,48 +1,10 @@
-﻿namespace Utils.Serializers.WritableObjects
+﻿using System;
+using System.Collections.Generic;
+
+namespace Utils.Serializers.WritableObjects
 {
 	public static class ReaderUtils
 	{
-		private static readonly Dictionary<Type, Delegate> binaryReaderFunctions = new()
-		{
-			[typeof(bool)] = (BinaryReader reader) => reader.ReadBoolean(),
-			[typeof(byte)] = (BinaryReader reader) => reader.ReadByte(),
-			[typeof(sbyte)] = (BinaryReader reader) => reader.ReadSByte(),
-
-			[typeof(short)] = (BinaryReader reader) => reader.ReadInt16(),
-			[typeof(ushort)] = (BinaryReader reader) => reader.ReadUInt16(),
-
-			[typeof(int)] = (BinaryReader reader) => reader.ReadInt32(),
-			[typeof(uint)] = (BinaryReader reader) => reader.ReadUInt32(),
-			[typeof(float)] = (BinaryReader reader) => reader.ReadSingle(),
-
-			[typeof(decimal)] = (BinaryReader reader) => reader.ReadDecimal(),
-			[typeof(double)] = (BinaryReader reader) => reader.ReadDouble(),
-			[typeof(long)] = (BinaryReader reader) => reader.ReadInt64(),
-			[typeof(ulong)] = (BinaryReader reader) => reader.ReadUInt64(),
-
-			[typeof(char)] = (BinaryReader reader) => reader.ReadChar(),
-			[typeof(string)] = (BinaryReader reader) => reader.ReadString(),
-
-			[typeof(Guid)] = (BinaryReader reader) => new Guid(reader.ReadBytes(16)),
-		};
-		public static bool TryRead<T>(this BinaryReader reader, out T value) 
-		{
-			Type type = typeof(T);
-			if (!binaryReaderFunctions.TryGetValue(type, out Delegate del))
-			{
-				value = default;
-				return false;
-			}
-
-			if (del is not Func<BinaryReader, T> readFunc)
-			{
-				throw new Exception("Read Function Type Mismatch! Mapping is Incorrect!");
-			}
-
-			value = readFunc(reader);
-			return true;
-		}
-
 		private static readonly Dictionary<Type, Func<IReader, object>> enumReaders = new()
 		{
 			[typeof(sbyte)] = reader => reader.Read<sbyte>(),
