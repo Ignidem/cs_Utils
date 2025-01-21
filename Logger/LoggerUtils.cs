@@ -17,8 +17,18 @@ namespace Utils.Logger
 			return (ILogger)Activator.CreateInstance(type);
 		}
 
-		public static void LogMessage(this string message) => Logger.Log(Severity.Log, message);
-		public static void LogException(this Exception e) => Logger.Log(e);
+		public static void LogMessage(this string message)
+		{
+			if (!string.IsNullOrEmpty(message))
+				Logger.Log(Severity.Log, message);
+		}
+
+		public static void LogException(this Exception e)
+		{
+			if (e != null)
+				Logger.Log(e);
+		}
+
 		public static async void LogException(this Task task)
 		{
 			if (task == null)
