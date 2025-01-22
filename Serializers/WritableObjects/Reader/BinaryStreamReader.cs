@@ -17,6 +17,7 @@ namespace Utils.Serializers.WritableObjects.Reader
 		protected readonly Stream stream;
 		protected readonly BinaryReader reader;
 
+		public BinaryStreamReader(byte[] data) : this(new MemoryStream(data)) { }
 		public BinaryStreamReader(Stream stream)
 		{
 			reader = new BinaryReader(stream);
