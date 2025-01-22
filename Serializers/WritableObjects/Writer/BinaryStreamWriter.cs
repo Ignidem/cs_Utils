@@ -9,6 +9,10 @@ namespace Utils.Serializers.WritableObjects
 		where TReader : IReader
 	{
 		private static readonly Dictionary<Type, Delegate> writerFunctions = new();
+		public static void SetFunction<T>(Action<TWriter, T> func)
+		{
+			writerFunctions[typeof(T)] = func;
+		}
 
 		protected readonly Stream stream;
 		protected readonly BinaryWriter writer;
