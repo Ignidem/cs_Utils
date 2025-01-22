@@ -62,6 +62,9 @@ namespace Utils.Versioning
 			return true;
 		}
 
+		public static implicit operator Version(int hash) => new Version(hash); 
+		public static implicit operator int(Version ver) => ver.hash; 
+
 		public static bool operator ==(Version a, Version b) => a.hash == b.hash;
 		public static bool operator !=(Version a, Version b) => a.hash != b.hash;
 		public static bool operator >(Version a, Version b) => a.hash > b.hash;
