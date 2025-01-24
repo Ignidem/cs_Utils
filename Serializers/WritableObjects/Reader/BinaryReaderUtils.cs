@@ -25,7 +25,11 @@ namespace Utils.Serializers.WritableObjects
 			[typeof(ulong)] = (Func<BinaryReader, ulong>)((BinaryReader reader) => reader.ReadUInt64()),
 
 			[typeof(char)] = (Func<BinaryReader, char>)((BinaryReader reader) => reader.ReadChar()),
-			[typeof(string)] = (Func<BinaryReader, string>)((BinaryReader reader) => reader.ReadString()),
+			[typeof(string)] = (Func<BinaryReader, string>)((BinaryReader reader) => 
+			{
+				bool isNull = reader.ReadBoolean();
+				return isNull ? null : reader.ReadString();
+			}),
 
 			[typeof(Guid)] = (Func<BinaryReader, Guid>)((BinaryReader reader) => new Guid(reader.ReadBytes(16))),
 			[typeof(DateTime)] = (Func<BinaryReader, DateTime>)((BinaryReader reader) => new DateTime(reader.ReadInt64())),

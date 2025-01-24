@@ -25,7 +25,13 @@ namespace Utils.Serializers.WritableObjects
 			[typeof(ulong)] = (Action<BinaryWriter, ulong>)((BinaryWriter writer, ulong value) => writer.Write(value)),
 
 			[typeof(char)] = (Action<BinaryWriter, char>)((BinaryWriter writer, char value) => writer.Write(value)),
-			[typeof(string)] = (Action<BinaryWriter, string>)((BinaryWriter writer, string value) => writer.Write(value)),
+			[typeof(string)] = (Action<BinaryWriter, string>)((BinaryWriter writer, string value) =>
+			{
+				bool isNull = value == null;
+				writer.Write(isNull);
+				if (!isNull)
+					writer.Write(value);
+			}),
 
 			[typeof(Guid)] = (Action<BinaryWriter, Guid>)((BinaryWriter writer, Guid value) => writer.Write(value.ToByteArray())),
 			[typeof(DateTime)] = (Action<BinaryWriter, DateTime>)((BinaryWriter writer, DateTime value) => writer.Write(value.Ticks)),
