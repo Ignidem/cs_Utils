@@ -28,6 +28,7 @@ namespace Utils.Serializers.WritableObjects
 			[typeof(string)] = (Action<BinaryWriter, string>)((BinaryWriter writer, string value) => writer.Write(value)),
 
 			[typeof(Guid)] = (Action<BinaryWriter, Guid>)((BinaryWriter writer, Guid value) => writer.Write(value.ToByteArray())),
+			[typeof(DateTime)] = (Action<BinaryWriter, DateTime>)((BinaryWriter writer, DateTime value) => writer.Write(value.Ticks)),
 		};
 
 		public static bool TryWritePrimitive<T>(this BinaryWriter writer, T value)
