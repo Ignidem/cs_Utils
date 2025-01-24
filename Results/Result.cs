@@ -2,6 +2,14 @@
 
 namespace Utils.Results
 {
+	public static class ResultUtils
+	{
+		public static bool IsFailed(this ref Result result) 
+		{
+			return !result;
+		}
+	}
+
 	public readonly struct Result<T> : IResult<T>
 	{
 		public static implicit operator Result<T>(T result) => new Result<T>(result);
