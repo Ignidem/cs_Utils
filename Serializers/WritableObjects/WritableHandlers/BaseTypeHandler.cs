@@ -29,6 +29,7 @@ namespace Utils.Serializers.WritableObjects
 		}
 
 		public abstract T Read(TReader reader);
+		public abstract T ReadType(TReader reader, string name);
 		public abstract void Write(TWriter reader, T value);
 	}
 }

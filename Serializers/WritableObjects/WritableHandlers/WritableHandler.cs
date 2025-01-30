@@ -50,5 +50,9 @@ namespace Utils.Serializers.WritableObjects
 
 			return cntr(reader);
 		}
+		public override T ReadType(TReader reader, string name)
+		{
+			return cntr(reader);
+		}
 	}
 }

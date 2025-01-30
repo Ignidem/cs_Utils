@@ -10,6 +10,7 @@ namespace Utils.Serializers.WritableObjects
 		public interface IHandler<T> : IWritableHandler
 		{
 			T Read(TReader reader);
+			T ReadType(TReader reader, string name);
 			void Write(TWriter reader, T value);
 		}
 
@@ -21,7 +22,7 @@ namespace Utils.Serializers.WritableObjects
 		}
 
 		#region T Writable
-		private static IHandler<T> GetWritableSerializer<T>()
+		public static IHandler<T> GetWritableSerializer<T>()
 		{
 			Type type = typeof(T);
 			if (serializers.TryGetValue(type, out IWritableHandler _serializer))

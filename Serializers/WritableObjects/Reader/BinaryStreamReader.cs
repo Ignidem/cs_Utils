@@ -38,6 +38,17 @@ namespace Utils.Serializers.WritableObjects.Reader
 
 			return ReadNonPrimitive<T>();
 		}
+		public T ReadType<T>(string name)
+		{
+			GenericWritable<TReader, TWriter>.IHandler<T> handler = GenericWritable<TReader, TWriter>.GetWritableSerializer<T>(); 
+
+			if (this is not TReader reader)
+			{
+				throw new Exception();
+			}
+
+			return handler.ReadType(reader, name);
+		}
 
 		protected T ReadNonPrimitive<T>()
 		{

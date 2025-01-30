@@ -17,10 +17,10 @@ namespace Utils.Serializers.WritableObjects
 		public override T Read(TReader reader)
 		{
 			string name = reader.Read<string>();
-			return Read(reader, name);
+			return ReadType(reader, name);
 		}
 
-		protected T Read(TReader reader, string name)
+		public override T ReadType(TReader reader, string name)
 		{
 			return readers.Read(name, reader);
 		}
