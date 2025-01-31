@@ -7,5 +7,9 @@ namespace Utils.Serializers.WritableObjects
 		long Size { get; }
 		long Capacity { get; }
 		void Write<T>(T value);
+		void Flush()
+		{
+			throw new NotImplementedException(GetType().Name);
+		}
 	}
 }

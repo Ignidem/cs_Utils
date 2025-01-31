@@ -41,6 +41,7 @@ namespace Utils.Serializers.WritableObjects
 				stream.Dispose();
 			GC.SuppressFinalize(this);
 		}
+		public void Flush() => writer.Flush();
 
 		public void Write<T>(T value)
 		{
