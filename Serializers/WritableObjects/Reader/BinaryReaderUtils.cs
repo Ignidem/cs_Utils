@@ -34,6 +34,7 @@ namespace Utils.Serializers.WritableObjects
 			[typeof(Guid)] = (Func<BinaryReader, Guid>)((BinaryReader reader) => new Guid(reader.ReadBytes(16))),
 			[typeof(DateTime)] = (Func<BinaryReader, DateTime>)((BinaryReader reader) => new DateTime(reader.ReadInt64())),
 		};
+
 		public static bool TryRead<T>(this BinaryReader reader, out T value) 
 		{
 			Type type = typeof(T);
@@ -51,6 +52,5 @@ namespace Utils.Serializers.WritableObjects
 			value = readFunc(reader);
 			return true;
 		}
-
 	}
 }

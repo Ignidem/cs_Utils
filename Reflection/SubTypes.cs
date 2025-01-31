@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Utilities.Collections;
+using Utils.Logger;
 
 namespace Utilities.Reflection
 {
@@ -15,7 +16,7 @@ namespace Utilities.Reflection
             if (subTypes.TryGetValue(type, out Type[] types)) 
                 return types;
 
-            types = type.GetImplementations().ToArray();
+			types = type.GetImplementations().ToArray();
             subTypes[type] = types;
             return types;
         }
@@ -29,10 +30,34 @@ namespace Utilities.Reflection
         public static IEnumerable<Type> GetImplementations(this Type type, IEnumerable<Assembly> assemblies)
         {
 			assemblies ??= AppDomain.CurrentDomain.GetAssemblies();
-			return assemblies.SelectMany(a => a.GetTypes().Where(t =>
-                !t.IsInterface && !t.IsAbstract
-                && (t == type || t.Inherits(type)))
-			);
+
+			IEnumerable<Type> GetTypes(Assembly assembly)
+			{
+				try
+				{
+					return assembly.GetTypes();
+				}
+				catch (Exception e)
+				{
+					e.LogException();
+					return System.Linq.Enumerable.Empty<Type>();
+				}
+			}
+
+			bool ValidateType(Type t)
+			{
+				try
+				{
+					return !t.IsInterface && !t.IsAbstract && (t == type || t.Inherits(type));
+				}
+				catch (Exception e)
+				{
+					e.LogException();
+					return false;
+				}
+			}
+
+			return assemblies.SelectMany(GetTypes).Where(ValidateType);
         }
     }
 }

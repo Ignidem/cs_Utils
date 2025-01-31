@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Utils.Serializers.WritableObjects.Reader
 {
-	public class BinaryStreamReader<TReader, TWriter> : IReader
+	public abstract class BinaryStreamReader<TReader, TWriter> : IReader
 		where TReader : IReader
 		where TWriter : IWriter
 	{
@@ -16,10 +16,12 @@ namespace Utils.Serializers.WritableObjects.Reader
 
 		protected readonly Stream stream;
 		protected readonly BinaryReader reader;
+		private readonly bool disposeStream;
 
-		public BinaryStreamReader(byte[] data) : this(new MemoryStream(data)) { }
-		public BinaryStreamReader(Stream stream)
+		public BinaryStreamReader(byte[] data) : this(new MemoryStream(data), true) { }
+		public BinaryStreamReader(Stream stream, bool disposeStream)
 		{
+			this.disposeStream = disposeStream;
 			reader = new BinaryReader(stream);
 			this.stream = stream;
 		}
@@ -27,7 +29,8 @@ namespace Utils.Serializers.WritableObjects.Reader
 		public virtual void Dispose()
 		{
 			reader.Dispose();
-			stream.Dispose();
+			if (disposeStream)
+				stream.Dispose();
 			GC.SuppressFinalize(this);
 		}
 
@@ -38,6 +41,7 @@ namespace Utils.Serializers.WritableObjects.Reader
 
 			return ReadNonPrimitive<T>();
 		}
+
 		public T ReadType<T>(string name)
 		{
 			GenericWritable<TReader, TWriter>.IHandler<T> handler = GenericWritable<TReader, TWriter>.GetWritableSerializer<T>(); 
@@ -49,20 +53,19 @@ namespace Utils.Serializers.WritableObjects.Reader
 
 			return handler.ReadType(reader, name);
 		}
-
 		protected T ReadNonPrimitive<T>()
 		{
-			if (!TryGetReadFunc(out Func<TReader, T> readFunc))
-				readFunc = CreateReadFunc<T>();
-
 			if (this is not TReader reader)
 			{
 				throw new Exception();
 			}
 
-			return readFunc(reader);
-		}
+			if (TryGetReadFunc(out Func<TReader, T> readFunc))
+				return readFunc(reader);
 
+			GenericWritable<TReader, TWriter>.IHandler<T> handler = GenericWritable<TReader, TWriter>.GetWritableSerializer<T>();
+			return handler.Read(reader);
+		}
 		protected bool TryGetReadFunc<T>(out Func<TReader, T> reader)
 		{
 			if (!readerFunctions.TryGetValue(typeof(T), out Delegate delg) || delg is not Func<TReader, T> _reader)
@@ -73,12 +76,6 @@ namespace Utils.Serializers.WritableObjects.Reader
 
 			reader = _reader;
 			return true;
-		}
-		protected Func<TReader, T> CreateReadFunc<T>()
-		{
-			Func<TReader, T> readFunc = GenericWritable<TReader, TWriter>.GetReader<T>();
-			readerFunctions[typeof(T)] = readFunc;
-			return readFunc;
 		}
 	}
 }

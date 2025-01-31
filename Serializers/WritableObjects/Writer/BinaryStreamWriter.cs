@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Utils.Serializers.WritableObjects
 {
-	public class BinaryStreamWriter<TWriter, TReader> : IWriter
+	public abstract class BinaryStreamWriter<TWriter, TReader> : IWriter
 		where TWriter : IWriter
 		where TReader : IReader
 	{
@@ -16,6 +16,7 @@ namespace Utils.Serializers.WritableObjects
 
 		protected readonly Stream stream;
 		protected readonly BinaryWriter writer;
+		private readonly bool disposeStream;
 
 		public long Size => stream.Position;
 		public long Capacity => stream.Length;
@@ -25,9 +26,10 @@ namespace Utils.Serializers.WritableObjects
 			_ => throw new NotImplementedException(stream.GetType().Name)
 		};
 
-		public BinaryStreamWriter() : this(new MemoryStream()) { }
-		public BinaryStreamWriter(Stream stream)
+		public BinaryStreamWriter() : this(new MemoryStream(), true)  { }
+		public BinaryStreamWriter(Stream stream, bool disposeStream)
 		{
+			this.disposeStream = disposeStream;
 			writer = new BinaryWriter(stream);
 			this.stream = stream;
 		}
@@ -35,7 +37,8 @@ namespace Utils.Serializers.WritableObjects
 		public virtual void Dispose()
 		{
 			writer.Dispose();
-			stream.Dispose();
+			if (disposeStream)
+				stream.Dispose();
 			GC.SuppressFinalize(this);
 		}
 
@@ -44,20 +47,19 @@ namespace Utils.Serializers.WritableObjects
 			if (writer.TryWritePrimitive(value))
 				return;
 
-			WriteNonPrimitive(value);
-		}
-
-		protected void WriteNonPrimitive<T>(T value)
-		{
-			if (!TryGetWriteFunc(out Action<TWriter, T> writeFunc))
-				writeFunc = CreateReadFunc<T>();
-
-			if (this is not TWriter writer)
+			if (this is not TWriter twriter)
 			{
 				throw new Exception();
 			}
 
-			writeFunc(writer, value);
+			if (TryGetWriteFunc(out Action<TWriter, T> writeFunc))
+			{
+				writeFunc(twriter, value);
+				return;
+			}
+
+			GenericWritable<TReader, TWriter>.IHandler<T> handler = GenericWritable<TReader, TWriter>.GetWritableSerializer<T>();
+			handler.Write(twriter, value);
 		}
 
 		protected bool TryGetWriteFunc<T>(out Action<TWriter, T> writeFunc)
@@ -70,12 +72,6 @@ namespace Utils.Serializers.WritableObjects
 
 			writeFunc = _writeFunc;
 			return true;
-		}
-		protected Action<TWriter, T> CreateReadFunc<T>()
-		{
-			Action<TWriter, T> readFunc = GenericWritable<TReader, TWriter>.GetWriter<T>();
-			writerFunctions[typeof(T)] = readFunc;
-			return readFunc;
 		}
 	}
 }
