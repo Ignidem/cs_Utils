@@ -20,11 +20,18 @@ namespace Utils.Serializers.WritableObjects
 
 		public long Size => stream.Position;
 		public long Capacity => stream.Length;
-		public byte[] Data => stream switch
+		public byte[] Data
 		{
-			MemoryStream memory => memory.ToArray(),
-			_ => throw new NotImplementedException(stream.GetType().Name)
-		};
+			get
+			{
+				Flush();
+				return stream switch
+				{
+					MemoryStream memory => memory.ToArray(),
+					_ => throw new NotImplementedException(stream.GetType().Name)
+				};
+			}
+		}
 
 		public BinaryStreamWriter() : this(new MemoryStream(), true)  { }
 		public BinaryStreamWriter(Stream stream, bool disposeStream)
