@@ -23,6 +23,7 @@ namespace Utils.Results
 		public static bool operator true(Result<T> result) => result.IsSuccess;
 		public static bool operator false(Result<T> result) => !result.IsSuccess;
 		public static Result<T> operator &(Result<T> left, Result<T> right) => !left ? left : right;
+		public static Result<T> operator &(Result left, Result<T> right) => !left ? left : right;
 		public static Result<T> operator |(Result<T> left, Result<T> right) => left ? left : (right ? right : left);
 
 		public static Result<T> Empty = new Result<T>(default(T));
