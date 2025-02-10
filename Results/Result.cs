@@ -18,7 +18,7 @@ namespace Utils.Results
 		public static implicit operator T(Result<T> result) => result.value;
 
 		public static implicit operator Result(Result<T> result) => new Result(result.IsSuccess, result.Message);
-		public static implicit operator Result<T>(Result result) => new Result<T>(result.Message);
+		public static implicit operator Result<T>(Result result) => result.IsSuccess ? new Result<T>(default, true) : new Result<T>(result.Message);
 
 		public static bool operator true(Result<T> result) => result.IsSuccess;
 		public static bool operator false(Result<T> result) => !result.IsSuccess;
@@ -38,10 +38,11 @@ namespace Utils.Results
 		public string Message { get; }
 		public bool HasMessage => !string.IsNullOrEmpty(Message);
 
-		public Result(T value)
+		public Result(T value) : this (value, value != null) { }
+		public Result(T value, bool isSuccess)
 		{
 			this.value = value;
-			IsSuccess = this.value != null;
+			IsSuccess = isSuccess;
 			Message = null;
 		}
 		public Result(string message)
