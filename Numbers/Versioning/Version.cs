@@ -9,7 +9,7 @@ namespace Utils.Versioning
 		Alpha,
 		Beta,
 		Candidate,
-		Release
+		Release,
 	}
 
 	public readonly struct Version
