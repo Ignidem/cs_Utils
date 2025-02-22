@@ -15,7 +15,7 @@ namespace Utilities.Extensions
 		}
 		public static int RandomIndex(int size)
 		{
-			return Numbers.RandomEx.Int(size);
+			return size == 1 ? 0 : Numbers.RandomEx.Int(size);
 		}
 
 		public static (T?, V?) RandomElement<T, V>(this Dictionary<T, V> dict)
