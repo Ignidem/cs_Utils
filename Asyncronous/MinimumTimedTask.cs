@@ -22,13 +22,20 @@ namespace Utils.Asyncronous
 			watch?.Stop();
 		}
 
+		public readonly bool IsElapsed()
+		{
+			return miliseconds <= 0 || watch.ElapsedMilliseconds >= miliseconds;
+		}
+
+		public readonly void Restart() => watch?.Restart();
+
 		public readonly TaskAwaiter GetAwaiter()
 		{
 			if (miliseconds <= 0) return Task.CompletedTask.GetAwaiter();
 
 			int delta = (miliseconds - (int)watch.ElapsedMilliseconds);
 			Task task = delta > 0 ? Task.Delay(delta) : Task.CompletedTask;
-			watch.Restart();
+			Restart();
 			return task.GetAwaiter();
 		}
 	}
