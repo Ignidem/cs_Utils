@@ -23,5 +23,13 @@ namespace Utils.Numbers
 			double a = height / (2 * Math.Pow(w, 3));
 			return a * Math.Pow(value - w, 3) + (height / 2);
 		}
+
+		public static double WeightedCubicExponent(this double value, double weight, double height, double width, double curve)
+		{
+			double exp = BoxedExponent(value, height, width, curve);
+			double cube = BoxedCubic(value, height, width);
+
+			return (1 - weight) * exp + (weight * cube);
+		}
 	}
 }
