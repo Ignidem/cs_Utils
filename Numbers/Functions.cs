@@ -8,20 +8,60 @@ namespace Utils.Numbers
 {
 	public static class Functions
 	{
+		[Obsolete]
 		public static double BoxedExponent(this double value, double height, double width, double curve)
+		{
+			return Exponent(value, width, height, curve);
+		}
+		/// <summary>
+		/// Exponential function within ranges of [0-max].
+		/// </summary>
+		/// <param name="x">Input x value in range [0-<paramref name="xMax"/>]</param>
+		/// <param name="xMax">The maximum expected x value</param>
+		/// <param name="yMax">The maximum returned y value</param>
+		/// <param name="curve">Adjusts the curviture of the function</param>
+		/// <returns>Output y value in range [0-<paramref name="yMax"/>]</returns>
+		public static double Exponent(this double x, double xMax, double yMax, double curve)
 		{
 			if (curve == 1)
 				curve = 1.00001;
 
-			double a = height / (Math.Pow(curve, width) - 1);
-			return (a * Math.Pow(curve, value)) - a;
+			double a = yMax / (Math.Pow(curve, xMax) - 1);
+			return (a * Math.Pow(curve, x)) - a;
 		}
 
+		[Obsolete]
 		public static double BoxedCubic(this double value, double height, double width)
 		{
-			double w = width / 2;
-			double a = height / (2 * Math.Pow(w, 3));
-			return a * Math.Pow(value - w, 3) + (height / 2);
+			return Cubic(value, width, height);
+		}
+		/// <summary>
+		/// Exponential function within ranges of [0-max].
+		/// </summary>
+		/// <param name="x">Input x value in range [0-<paramref name="xMax"/>]</param>
+		/// <param name="xMax">The maximum expected x value</param>
+		/// <param name="yMax">The maximum returned y value</param>
+		/// <returns>Output y value in range [0-<paramref name="yMax"/>]</returns>
+		public static double Cubic(this double x, double xMax, double yMax)
+		{
+			double w = xMax / 2;
+			double a = yMax / (2 * Math.Pow(w, 3));
+			return a * Math.Pow(x - w, 3) + (yMax / 2);
+		}
+
+		/// <summary>
+		/// Logarithmic function within the ranges of [0-max].
+		/// </summary>
+		/// <param name="x">Input x value in range [0-<paramref name="xMax"/>]</param>
+		/// <param name="xMax">The maximum expected x value</param>
+		/// <param name="yMax">The maximum returned y value</param>
+		/// <param name="curve">Adjusts the curviture of the function</param>
+		/// <returns>Output y value in range [0-<paramref name="yMax"/>]</returns>
+		public static double Log(this double x, double xMax, double yMax, double curve)
+		{
+			double a = yMax / Math.Log(curve + 1);
+			double b = curve / xMax;
+			return a * Math.Log((b * x) + 1);
 		}
 	}
 }
