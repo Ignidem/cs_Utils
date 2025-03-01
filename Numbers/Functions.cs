@@ -64,10 +64,10 @@ namespace Utils.Numbers
 			return a * Math.Log((b * x) + 1);
 		}
 
-		public static double WeightedCubicExponent(this double value, double weight, double height, double width, double curve)
+		public static double WeightedCubicExponent(this double value, double weight, double yMax, double xMax, double curve)
 		{
-			double exp = BoxedExponent(value, height, width, curve);
-			double cube = BoxedCubic(value, height, width);
+			double exp = Exponent(value, xMax, yMax, curve);
+			double cube = Cubic(value, xMax, yMax);
 
 			return (1 - weight) * exp + (weight * cube);
 		}
