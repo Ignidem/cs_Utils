@@ -1,4 +1,5 @@
 ﻿using System;
+using Utilities.Reflection;
 
 namespace Utils.Serializers.WritableObjects
 {
@@ -8,19 +9,33 @@ namespace Utils.Serializers.WritableObjects
 	{
 		private readonly Constructor cntr;
 		private readonly Type type;
-		//private readonly Type groupType;
+		private readonly Type writerType;
+		private readonly Type writableType;
 		public WritableHandler()
 		{
 			type = typeof(T);
+			writerType = typeof(TWriter);
+			writableType = typeof(IWritable<TWriter>);
 			cntr = CreateConstructor(type);
 		}
 
 		public override void Write(TWriter writer, T value)
 		{
-			if (value is not IWritable<TWriter> writable)
-				throw new Exception($"{value.GetType()} is not {nameof(IWritable)}<{nameof(TWriter)}>");
-
-			writable.Write(writer);
+#if UNITY_ANDROID
+			try
+			{
+				((IWritable<TWriter>)value).Write(writer);
+				return;
+			}
+			catch (InvalidCastException) { }
+#else
+			if (value is IWritable<TWriter> writable)
+			{
+				writable.Write(writer);
+				return;
+			}
+#endif
+			throw new Exception($"{value.GetType()} is not IWritable<{writerType.Name}>");
 		}
 
 		public override T Read(TReader reader)
