@@ -2,20 +2,12 @@
 
 namespace Utils.Results
 {
-	public static class ResultUtils
-	{
-		public static bool IsFailed(this ref Result result) 
-		{
-			return !result;
-		}
-	}
-
 	public readonly struct Result<T> : IResult<T>
 	{
 		public static implicit operator Result<T>(T result) => new Result<T>(result);
 		public static implicit operator Result<T>(string message) => new Result<T>(message);
 		public static implicit operator bool(Result<T> result) => result.IsSuccess;
-		public static implicit operator T(Result<T> result) => result.value;
+		public static implicit operator T(Result<T> result) => result.Value;
 
 		public static implicit operator Result(Result<T> result) => new Result(result.IsSuccess, result.Message);
 		public static implicit operator Result<T>(Result result) => result.IsSuccess ? new Result<T>(default, true) : new Result<T>(result.Message);
@@ -33,7 +25,7 @@ namespace Utils.Results
 			return Task.FromResult(result);
 		}
 
-		public readonly T value;
+		public T Value { get; }
 		public bool IsSuccess { get; }
 		public string Message { get; }
 		public bool HasMessage => !string.IsNullOrEmpty(Message);
@@ -41,20 +33,20 @@ namespace Utils.Results
 		public Result(T value) : this (value, value != null) { }
 		public Result(T value, bool isSuccess)
 		{
-			this.value = value;
+			this.Value = value;
 			IsSuccess = isSuccess;
 			Message = null;
 		}
 		public Result(string message)
 		{
-			value = default;
+			Value = default;
 			IsSuccess = false;
 			Message = message;
 		}
 
 		public override string ToString()
 		{
-			return Message ?? value?.ToString() ?? (IsSuccess ? "Success" : "Failure");
+			return Message ?? Value?.ToString() ?? (IsSuccess ? "Success" : "Failure");
 		}
 	}
 
