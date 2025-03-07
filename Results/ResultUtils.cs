@@ -1,27 +1,28 @@
-namespace Utils.Results;
-
-public static class ResultUtils
+namespace Utils.Results
 {
-    public static bool IsFailed(this ref Result result) 
-    {
-        return !result;
-    }
-		
-    public static bool IsSuccess<T>(this IResult<T> result, out T value)
-    {
-        if (result.IsSuccess)
-        {
-            value = result.Value;
-            return true;
-        }
+	public static class ResultUtils
+	{
+		public static bool IsFailed(this ref Result result)
+		{
+			return !result;
+		}
 
-        value = default;
-        return false;
-    }
+		public static bool IsSuccess<T>(this IResult<T> result, out T value)
+		{
+			if (result.IsSuccess)
+			{
+				value = result.Value;
+				return true;
+			}
 
-    public static bool IsSuccess<T>(this IResult<T> result, out T value, out string message)
-    {        
-        message = result.Message;
-        return result.IsSuccess(out value);
-    }
+			value = default;
+			return false;
+		}
+
+		public static bool IsSuccess<T>(this IResult<T> result, out T value, out string message)
+		{
+			message = result.Message;
+			return result.IsSuccess(out value);
+		}
+	}
 }
