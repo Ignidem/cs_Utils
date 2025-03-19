@@ -27,14 +27,14 @@ namespace Utilities.Numbers
 			return value.Remap(float.MinValue, float.MaxValue, min, inclusiveMax);
 		}
 
-		public static bool Chance(int chance) 
+		public static bool Odds(int chance) 
 			=> chance > 0 && Int(101) <= chance;
-		public static bool Chance(this Random rng, int chance)
+		public static bool Odds(this Random rng, int chance)
             => chance > 0 && rng.Next(101) <= chance;
 
-		public static bool Chance(float chance)
+		public static bool Odds(float chance)
 			=> chance > 0 && Float(100) <= chance;
-		public static bool Chance(this Random rng, float chance)
+		public static bool Odds(this Random rng, float chance)
             => chance > 0 && (rng.Next(100) + rng.NextDouble()) <= chance;
     }
 }
