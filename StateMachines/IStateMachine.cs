@@ -17,7 +17,7 @@ namespace Utils.StateMachines
 		TaskAwaiter GetAwaiter();
 	}
 
-	public partial interface IStateMachine<K> : IStateMachine
+	public interface IStateMachine<K> : IStateMachine
 	{
 		new IState<K> ActiveState { get; }
 		IState<K> NextState { get; }

@@ -7,6 +7,12 @@ namespace Utils.Results
 			return !result;
 		}
 
+		public static bool IsFailed(this Result result, out string message)
+		{
+			message = result.Message;
+			return !result.IsSuccess;
+		}
+
 		public static bool IsSuccess<T>(this IResult<T> result, out T value)
 		{
 			if (result.IsSuccess)
