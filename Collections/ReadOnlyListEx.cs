@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Utilities.Enumerable;
 
 namespace Utilities.Collections
 {
@@ -36,6 +37,19 @@ namespace Utilities.Collections
 					return i;
 			}
 
+			return -1;
+		}
+		public static int IndexOf<T>(this IReadOnlyList<T> list, Predicate<T> predicate, out T item)
+		{
+			for (int i = 0; i < list.Count; i++)
+			{
+				T element = list[i];
+				if (!predicate(element)) continue;
+				item = element;
+				return i;
+			}
+
+			item = default;
 			return -1;
 		}
 		public static IReadOnlyList<T> Add<T>(this IReadOnlyList<T> list, T item)
@@ -87,6 +101,7 @@ namespace Utilities.Collections
 
 			return arr;
 		}
+		
 		public static bool TryGetAt<T>(this IReadOnlyList<T> list, int index, out T item)
 		{
 			if (index < 0 || index >= list.Count)
