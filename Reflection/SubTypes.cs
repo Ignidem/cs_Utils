@@ -35,13 +35,16 @@ namespace Utilities.Reflection
 			{
 				try
 				{
-					return assembly.GetTypes();
+					if (!assembly.IsDynamic)
+						return assembly.GetTypes();
 				}
+				catch (ReflectionTypeLoadException) { }
 				catch (Exception e)
 				{
 					e.LogException();
-					return System.Linq.Enumerable.Empty<Type>();
 				}
+				
+				return System.Linq.Enumerable.Empty<Type>();
 			}
 
 			bool ValidateType(Type t)
