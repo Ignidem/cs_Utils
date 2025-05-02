@@ -16,11 +16,15 @@ namespace Utils.Numbers
 		/// <summary>
 		/// Exponential function within ranges of [0-max].
 		/// </summary>
-		/// <param name="x">Input x value in range [0-<paramref name="xMax"/>]</param>
+		/// <param name="x">Input x value in range [0,<paramref name="xMax"/>]</param>
 		/// <param name="xMax">The maximum expected x value</param>
 		/// <param name="yMax">The maximum returned y value</param>
-		/// <param name="curve">Adjusts the curviture of the function</param>
-		/// <returns>Output y value in range [0-<paramref name="yMax"/>]</returns>
+		/// <param name="curve">Adjusts the curvature of the function with ranges [0,1[ U ]1,oo[.
+		/// Under 1: Higher Y distribution /-.
+		/// Near 1: Linear /, 1 is converted to 1.00001.
+		/// Above 1: Lower Y distribution _/.
+		/// </param>
+		/// <returns>Output y value in range [0,<paramref name="yMax"/>]</returns>
 		public static double Exponent(this double x, double xMax, double yMax, double curve)
 		{
 			if (curve == 1)
