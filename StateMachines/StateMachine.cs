@@ -118,7 +118,8 @@ namespace Utils.StateMachines
 				IState<K> exitingState = ActiveState;
 				if (state == exitingState)
 				{
-					await exitingState.Reload(data);
+					transitionTask = exitingState.Reload(data);
+					await transitionTask;
 					return;
 				}
 

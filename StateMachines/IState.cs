@@ -28,7 +28,8 @@ namespace Utils.StateMachines
 
 		public virtual async Task Reload(IStateData<K> data)
 		{
-			IStateMachine<K> machine = StateMachine;
+			IStateMachine<K> machine = StateMachine ?? throw new NullReferenceException(nameof(StateMachine));
+			
 			await Exit();
 			await Cleanup();
 			await Preload(data);
@@ -47,8 +48,8 @@ namespace Utils.StateMachines
 		public Task Enter(IStateMachine<K> stateMachine) 
 		{
 			IsActive = true;
-
-			if (StateMachine != stateMachine && StateMachine != null)
+			
+			if (StateMachine != null && !ReferenceEquals(stateMachine, StateMachine))
 			{
 				throw new Exception(string.Format("State {0}<{1}> is already active in another state machine {2}",
 					GetType().Name, Key, StateMachine.GetType().Name));
