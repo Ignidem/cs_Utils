@@ -45,6 +45,14 @@ namespace Utils.Delegates
 			where TAttribute : Attribute
 		{
 			Type type = target.GetType();
+			ForeachMethodWithAttribute(type, callbacks, bindingFlags);
+		}
+
+		public static void ForeachMethodWithAttribute<TAttribute>(this Type type,
+			Action<MethodInfo, TAttribute> callbacks,
+			BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic)
+			where TAttribute : Attribute
+		{
 			MethodInfo[] methods = type.GetMethods(bindingFlags);
 
 			for (int i = 0; i < methods.Length; i++)
@@ -56,6 +64,20 @@ namespace Utils.Delegates
 					continue;
 
 				callbacks(method, attribute);
+			}
+		}		
+		public static void ForeachMethodWithAttributes<TAttribute>(this Type type,
+			Action<MethodInfo, TAttribute> callbacks,
+			BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic)
+			where TAttribute : Attribute
+		{
+			MethodInfo[] methods = type.GetMethods(bindingFlags);
+
+			for (int i = 0; i < methods.Length; i++)
+			{
+				MethodInfo method = methods[i];
+				foreach (TAttribute attribute in method.GetCustomAttributes<TAttribute>())
+					callbacks(method, attribute);
 			}
 		}
 	}
