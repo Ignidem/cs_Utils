@@ -22,8 +22,6 @@ namespace Utilities.Reflection
 
 		public static bool Inherits(this Type type, Type otherType)
 		{
-			if (type == null && otherType == null) return true;
-
 			if (type == null || otherType == null) return false;
 
 			if (type == otherType) return true;
