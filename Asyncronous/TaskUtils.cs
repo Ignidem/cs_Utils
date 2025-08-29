@@ -21,14 +21,17 @@ namespace Utils.Asyncronous
 		}
 		private static async void AwaitSuccess(this Task task, Action action)
 		{
-			if (task == null || action == null) return;
-
 			try
 			{
+				if (task == null || action == null) return;
+
 				await task;
 				action();
 			}
-			catch { }
+			catch
+			{
+				// ignored
+			}
 		}
 
 		public static Task<T> OnSuccess<T>(this Task<T> task, Action<T> onSuccess)
