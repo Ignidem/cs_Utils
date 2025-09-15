@@ -18,7 +18,7 @@ namespace Utilities.Numbers
 		public static int Int(int exclusiveMax) => Int(0, exclusiveMax);
 		public static int Int(int min, int exclusiveMax)
 		{
-			return RandomNumberGenerator.GetInt32(min, exclusiveMax);
+			return exclusiveMax <= min ? min : RandomNumberGenerator.GetInt32(min, exclusiveMax);
 		}
 		public static float Float(float inclusiveMax) => Float(0, inclusiveMax);
 		public static float Float(float min, float inclusiveMax)
