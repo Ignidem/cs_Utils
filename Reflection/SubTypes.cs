@@ -10,13 +10,14 @@ namespace Utilities.Reflection
 	public static class SubTypes
     {
         private static readonly Dictionary<Type, Type[]> subTypes = new Dictionary<Type, Type[]>();
+        public static List<Assembly> RelevantAssemblies = new();
 
-        public static Type[] GetSubTypes(this Type type)
+        public static Type[] GetSubTypes(this Type type, params Assembly[] assemblies)
         {
             if (subTypes.TryGetValue(type, out Type[] types)) 
                 return types;
 
-			types = type.GetImplementations().ToArray();
+			types = type.GetImplementations(assemblies).ToArray();
             subTypes[type] = types;
             return types;
         }
@@ -30,8 +31,8 @@ namespace Utilities.Reflection
         public static IEnumerable<Type> GetImplementations(this Type type, IEnumerable<Assembly> assemblies)
         {
 			assemblies ??= AppDomain.CurrentDomain.GetAssemblies();
-
-			IEnumerable<Type> GetTypes(Assembly assembly)
+			
+			static IEnumerable<Type> GetTypes(Assembly assembly)
 			{
 				try
 				{
