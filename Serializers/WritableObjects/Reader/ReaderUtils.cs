@@ -17,6 +17,13 @@ namespace Utils.Serializers.WritableObjects
 			[typeof(ulong)] = reader => reader.Read<ulong>(),
 		};
 
+		public static T ReadNullable<T>(this IReader reader)
+			where T : class
+		{
+			bool hasValue = reader.Read<bool>();
+			return hasValue ? reader.Read<T>() : null;
+		}
+		
 		public static T ReadEnum<T>(this IReader reader)
 			where T : Enum
 		{

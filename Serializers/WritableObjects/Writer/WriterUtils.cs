@@ -17,6 +17,14 @@ namespace Utils.Serializers.WritableObjects
 			[typeof(ulong)] = (writer, value) => writer.Write((ulong)value),
 		};
 
+		public static void WriteNullable<T>(this IWriter writer, T value)
+			where T : class
+		{
+			bool hasValue = value != null;
+			writer.Write(hasValue);
+			if (hasValue) writer.Write(value);
+		}
+		
 		public static void WriteEnum<T>(this IWriter writer, T value)
 			where T : struct, Enum
 		{
