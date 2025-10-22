@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Utilities.Reflection;
 using Utils.Logger;
 
@@ -59,7 +57,7 @@ namespace Utils.Serializers.WritableObjects
 		}
 		private static void AddConstructor(Dictionary<string, Constructor> constructors, string name, Type type)
 		{
-			if (constructors.TryGetValue(name, out var cntr))
+			if (constructors.TryGetValue(name, out Constructor cntr))
 			{
 				LogError($"Type name of {type.FullName} is already used by {cntr.Target.GetType().FullName}");
 			}
@@ -105,7 +103,7 @@ namespace Utils.Serializers.WritableObjects
 			ParameterExpression param = Expression.Parameter(mainArgTypes[0]);
 
 			NewExpression cntr = GetTReaderConstructor(type, param) ?? GetIReaderConstructor(type, Expression.Parameter(subArgTypes[0])) ?? 
-				throw new NullReferenceException($"{type.FullName} has no {typeof(TReader).Name} or {typeof(IReader).Name} reader constructor");
+				throw new NullReferenceException($"{type.FullName} has no {typeof(TReader).Name} or {nameof(IReader)} reader constructor");
 
 			UnaryExpression convert = Expression.Convert(cntr, typeof(T));
 			Expression<Constructor> expression = Expression.Lambda<Constructor>(convert, param);

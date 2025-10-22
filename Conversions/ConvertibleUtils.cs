@@ -56,21 +56,35 @@ namespace Utilities.Conversions
 				return true;
 			}
 
-			try
-			{
-				result = (T)obj;
-				return true;
-			}
-			catch (Exception) { }
+			return TryCast(obj, out result) || TryChangeType(obj, out result);
+		}
+		
+		private static bool TryChangeType<T>(this object obj, out T result)
+		{				
 			try
 			{
 				result = (T)Convert.ChangeType(obj, typeof(T));
 				return true;
 			}
-			catch (Exception) { }
-
-			result = default!;
-			return false;
+			catch
+			{
+				result = default!;
+				return false;
+			}
+		}
+		
+		private static bool TryCast<T>(this object obj, out T result)
+		{
+			try
+			{
+				result = (T)obj;
+				return true;
+			}
+			catch 
+			{
+				result = default!;
+				return false;
+			}
 		}
 
 		public static T ConvertTo<T>(this object? obj)
@@ -103,19 +117,19 @@ namespace Utilities.Conversions
 			{
 				Type under = Enum.GetUnderlyingType(type);
 
-				object Default()
-				{
-					if (obj.GetType().Inherits(under) && Enum.TryParse(type, obj.ToString(), out object convertedObj))
-						return convertedObj;
-
-					return obj.TryChangeType(type, out convertedObj) ? convertedObj : default!;
-				}
-
 				return obj switch
 				{
 					string str => Enum.TryParse(type, str, true, out convertedObj),
-					_ =>  ((convertedObj = Default()) != null),
+					_ =>  (convertedObj = Default()) != null,
 				};
+
+				object? Default()
+				{
+					if (obj.GetType().Inherits(under) && Enum.TryParse(type, obj.ToString(), out object? convertedObj))
+						return convertedObj;
+
+					return obj.TryChangeType(type, out convertedObj) ? convertedObj : null;
+				}
 			}
 			catch
 			{
