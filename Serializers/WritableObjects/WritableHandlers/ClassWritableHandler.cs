@@ -1,5 +1,6 @@
 ﻿using System;
 using Utilities.Reflection;
+using Utils.Logger;
 
 namespace Utils.Serializers.WritableObjects
 {
@@ -16,12 +17,27 @@ namespace Utils.Serializers.WritableObjects
 
 		public override T Read(TReader reader)
 		{
+			DataType dataType = (DataType)reader.Read<byte>();
+			if (dataType == DataType.Null)
+				return default;
+			
 			string name = reader.Read<string>();
-			return ReadType(reader, name);
+			if (!string.IsNullOrEmpty(name))
+				return ReadType(reader, name);
+			
+			Exception exception = new ArgumentNullException($"{typeof(T).Name} 'name' read is null for DataType {dataType}");
+			exception.LogException();
+			throw exception;
 		}
 
 		public override T ReadType(TReader reader, string name)
-		{
+		{		
+			if (string.IsNullOrEmpty(name))
+			{
+				Exception exception = new ArgumentNullException($"{typeof(T).Name} 'name' read is null");
+				throw exception;
+			}
+			
 			return readers.Read(name, reader);
 		}
 
@@ -29,7 +45,7 @@ namespace Utils.Serializers.WritableObjects
 		{
 			if (value == null)
 			{
-				writer.Write(nullType);
+				writer.Write((byte)DataType.Null);
 				return;
 			}
 
@@ -40,8 +56,8 @@ namespace Utils.Serializers.WritableObjects
 				_ => throw new Exception($"{value.GetType()} is not {nameof(IWritable)}<{typeof(TWriter).Name}>")
 			};
 
-			Type type = writable.GetType();
-			string name = GetName(type);
+			writer.Write((byte)DataType.Object);
+			string name = GetName(writable.GetType());
 			writer.Write(name);
 			writable.Write(writer);
 		}

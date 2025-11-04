@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Utils.Logger;
 
 namespace Utils.Serializers.WritableObjects.Reader
 {
@@ -36,23 +37,20 @@ namespace Utils.Serializers.WritableObjects.Reader
 
 		public T Read<T>()
 		{
-			if (reader.TryRead(out T value))
-				return value;
-
-			return ReadNonPrimitive<T>();
-		}
-
-		public T ReadType<T>(string name)
-		{
-			GenericWritable<TReader, TWriter>.IHandler<T> handler = GenericWritable<TReader, TWriter>.GetWritableSerializer<T>(); 
-
-			if (this is not TReader reader)
+			try
 			{
-				throw new Exception();
-			}
+				if (reader.TryRead(out T value))
+					return value;
 
-			return handler.ReadType(reader, name);
+				return ReadNonPrimitive<T>();
+			}
+			catch (Exception e)
+			{
+				e.LogException();
+				throw new Exception("Error while reading " + typeof(T).Name);
+			}
 		}
+		
 		protected T ReadNonPrimitive<T>()
 		{
 			if (this is not TReader reader)

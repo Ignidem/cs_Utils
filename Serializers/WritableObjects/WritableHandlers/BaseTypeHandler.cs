@@ -8,7 +8,6 @@ namespace Utils.Serializers.WritableObjects
 		where TReader : IReader
 		where TWriter : IWriter
 	{
-		protected const string nullType = "__null";
 		protected delegate T Constructor(TReader reader);
 		private static readonly Type[] argType = new Type[] { typeof(TReader) };
 		protected static Constructor CreateConstructor(Type type)

@@ -9,7 +9,6 @@ namespace Utils.Serializers.WritableObjects
 	public class ReadableConstructors<T, TReader>
 		where TReader : IReader
 	{
-		public const string nullType = "__null";
 		public delegate T Constructor(TReader reader);
 		private static readonly Type[] mainArgTypes = new Type[] { typeof(TReader) };
 		private static readonly Type[] subArgTypes = new Type[] { typeof(IReader) };
@@ -113,16 +112,13 @@ namespace Utils.Serializers.WritableObjects
 		}
 
 		public T Read(string name, TReader reader)
-		{
-			if (name == nullType)
-				return default;
-
+		{			
 			if (string.IsNullOrEmpty(name))
 			{
 				Exception exception = new ArgumentNullException($"{typeof(T).Name} 'name' read is null");
 				throw exception;
 			}
-
+			
 			if (!constructors.TryGetValue(name, out Constructor cnt))
 			{
 				string message = $"Read invalid {typeof(T).Name} {typeof(TReader)}\n" + name;
