@@ -35,6 +35,14 @@ namespace Utils.Serializers.WritableObjects.Reader
 			GC.SuppressFinalize(this);
 		}
 
+		public T ReadType<T>(string name)
+		{
+			GenericWritable<TReader, TWriter>.IHandler<T> handler =
+				GenericWritable<TReader, TWriter>.GetWritableSerializer<T>();
+			if (this is not TReader reader) throw new Exception();
+			return handler.ReadType(reader, name);
+		}
+
 		public T Read<T>()
 		{
 			try

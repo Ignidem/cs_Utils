@@ -7,7 +7,7 @@ namespace Utilities.Reflection
 	public static class TypeEx
 	{
 		public static bool IsStruct(this Type type)
-			=> type != null && type.IsValueType && !type.IsPrimitive && !type.IsEnum;
+			=> type is { IsValueType: true, IsPrimitive: false, IsEnum: false };
 
 		public static object GetDefault(this Type type)
 		{
