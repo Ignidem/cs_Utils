@@ -30,6 +30,7 @@ namespace Utils.Serializers.WritableObjects.Reader
 #if WritableDebugging
 		public StringBuilder DebugContent { get; } = new StringBuilder();
 		public int Indent { get; set; }
+		private bool hasStarted;
 #endif
 		
 		public BinaryStreamReader(byte[] data) : this(new MemoryStream(data), true) { }
@@ -64,6 +65,12 @@ namespace Utils.Serializers.WritableObjects.Reader
 			try
 			{
 #if WritableDebugging
+				if (!hasStarted)
+				{
+					"Reading Data:".LogMessage();
+					hasStarted = true;
+				}
+				
 				Type writableInstance = typeof(T);
 				this.StartValue(writableInstance);
 #endif
