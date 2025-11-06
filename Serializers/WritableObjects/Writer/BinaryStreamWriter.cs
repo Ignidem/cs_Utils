@@ -25,11 +25,11 @@ namespace Utils.Serializers.WritableObjects
 		
 		public static void StartValue(this IWritableDebug debug, Type type)
 		{
+			debug.DebugContent.Append(debug.GetIndent());
 			if (type.IsValueType || type == typeof(string))
 				return;
 
 			debug.Indent++;
-			debug.DebugContent.Append(debug.GetIndent());
 			if (type.IsArray || typeof(IList).IsAssignableFrom(type))
 				debug.DebugContent.Append('[');
 			else
