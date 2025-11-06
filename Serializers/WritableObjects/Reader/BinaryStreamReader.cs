@@ -1,11 +1,19 @@
-﻿using System;
+﻿#define WritableDebugging
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Utils.Logger;
+#if WritableDebugging
+using System.Collections;
+using System.Text;
+#endif
 
 namespace Utils.Serializers.WritableObjects.Reader
 {
 	public abstract class BinaryStreamReader<TReader, TWriter> : IReader
+#if WritableDebugging
+		, IWritableDebug
+#endif
 		where TReader : IReader
 		where TWriter : IWriter
 	{
@@ -18,7 +26,12 @@ namespace Utils.Serializers.WritableObjects.Reader
 		protected readonly Stream stream;
 		protected readonly BinaryReader reader;
 		private readonly bool disposeStream;
-
+		
+#if WritableDebugging
+		public StringBuilder DebugContent { get; } = new StringBuilder();
+		public int Indent { get; set; }
+#endif
+		
 		public BinaryStreamReader(byte[] data) : this(new MemoryStream(data), true) { }
 		public BinaryStreamReader(Stream stream, bool disposeStream)
 		{
@@ -33,6 +46,9 @@ namespace Utils.Serializers.WritableObjects.Reader
 			if (disposeStream)
 				stream.Dispose();
 			GC.SuppressFinalize(this);
+#if WritableDebugging
+			DebugContent.ToString().LogMessage();
+#endif
 		}
 
 		public T ReadType<T>(string name)
@@ -47,10 +63,19 @@ namespace Utils.Serializers.WritableObjects.Reader
 		{
 			try
 			{
-				if (reader.TryRead(out T value))
-					return value;
-
-				return ReadNonPrimitive<T>();
+#if WritableDebugging
+				Type writableInstance = typeof(T);
+				this.StartValue(writableInstance);
+#endif
+				
+				if (!reader.TryRead(out T value))
+					value = ReadNonPrimitive<T>();
+				
+#if WritableDebugging
+				this.Value(writableInstance, value);
+				this.EndValue(writableInstance);
+#endif
+				return value;
 			}
 			catch (Exception e)
 			{
