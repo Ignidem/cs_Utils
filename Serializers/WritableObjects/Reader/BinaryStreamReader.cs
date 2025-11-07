@@ -1,5 +1,4 @@
-﻿#define WritableDebugging
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Utils.Logger;
@@ -28,7 +27,7 @@ namespace Utils.Serializers.WritableObjects.Reader
 		private readonly bool disposeStream;
 		
 #if WritableDebugging
-		public StringBuilder DebugContent { get; } = new StringBuilder();
+		public StringBuilder DebugContent { get; } = new StringBuilder("Reading Data:\n");
 		public int Indent { get; set; }
 		private bool hasStarted;
 #endif
@@ -65,12 +64,6 @@ namespace Utils.Serializers.WritableObjects.Reader
 			try
 			{
 #if WritableDebugging
-				if (!hasStarted)
-				{
-					"Reading Data:".LogMessage();
-					hasStarted = true;
-				}
-				
 				Type writableInstance = typeof(T);
 				this.StartValue(writableInstance);
 #endif

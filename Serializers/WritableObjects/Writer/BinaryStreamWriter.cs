@@ -1,5 +1,4 @@
-﻿#define WritableDebugging
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 #if WritableDebugging
@@ -27,7 +26,7 @@ namespace Utils.Serializers.WritableObjects
 		private readonly bool disposeStream;
 
 #if WritableDebugging
-		public StringBuilder DebugContent { get; } = new StringBuilder();
+		public StringBuilder DebugContent { get; } = new StringBuilder("Writer Data:\n");
 		public int Indent { get; set; }
 #endif
 		
@@ -39,7 +38,6 @@ namespace Utils.Serializers.WritableObjects
 			{
 				Flush();
 #if WritableDebugging
-				"Writer Data:".LogMessage();
 				DebugContent.ToString().LogMessage();
 #endif
 				return stream switch
