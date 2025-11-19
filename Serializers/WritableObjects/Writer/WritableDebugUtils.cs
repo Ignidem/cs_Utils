@@ -34,7 +34,7 @@ namespace Utils.Serializers.WritableObjects
 
 		public static void Value(this IWritableDebug debug, Type type, object value)
 		{
-			if (value == null || type.IsPrimitive || type == typeof(string))
+			if (value == null || type.IsValueType || type == typeof(string))
 			{
 				debug.DebugContent.AppendFormat("{0}: {1}\n", type, value);
 			}
