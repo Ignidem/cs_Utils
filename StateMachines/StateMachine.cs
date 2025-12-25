@@ -99,7 +99,7 @@ namespace Utils.StateMachines
 
 			Exception exception = lastTransition.GetTransitionException();
 			exception.LogException();
-			OnException.Invoke(exception);
+			OnException?.Invoke(exception);
 			return true;
 		}
 		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
