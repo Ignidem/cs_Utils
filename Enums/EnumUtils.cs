@@ -11,6 +11,13 @@ namespace Utilities.Enums
 			long val = Convert.ToInt64(value);
 			return val != 0 && (val & (val - 1)) == 0;
 		}
+
+		public static bool IsComposite<T>(T value)
+			where T : Enum
+		{
+			long val = Convert.ToInt64(value);
+			return val != 0 && (val & (val - 1)) != 0;
+		}
 		
 		public static T[] GetValues<T>() where T : Enum
 		{
