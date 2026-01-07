@@ -1,15 +1,8 @@
 using System;
 using System.Collections;
-using System.Text;
 
 namespace Utils.Serializers.WritableObjects
 {
-	public interface IWritableDebug
-	{
-		StringBuilder DebugContent { get; }
-		int Indent { get; set; }
-	}
-
 	public static class WritableDebugUtils
 	{
 		public static string GetIndent(this IWritableDebug debug)

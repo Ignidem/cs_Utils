@@ -32,31 +32,46 @@ namespace Utils.Serializers.WritableObjects
 			enumReaders[underlying](writer, value);
 		}
 
-		public static void WriteMany<T>(this IWriter writer, IReadOnlyList<T> values)
+		public static int WriteCount<T>(this IWriter writer, IReadOnlyList<T> values)
 		{
-			int count = values == null ? -1 : values.Count;
+			int count = values?.Count ?? -1;
 			writer.Write(count);
+			return count;
+		}
+		public static void WriteArray<T>(this IWriter writer, IReadOnlyList<T> values)
+		{
+			int count = writer.WriteCount(values);
 			for (int i = 0; i < count; i++)
-			{
-				T value = values[i];
-				writer.Write(value);
-			}
+				writer.Write(values[i]);
 		}
 		public static void WriteList<T>(this IWriter writer, IList<T> values)
 		{
-			int count = values == null ? -1 : values.Count;
-			writer.Write(count);
-			for (int i = 0; i < count; i++)
+			if (values == null)
 			{
-				T value = values[i];
-				writer.Write(value);
+				writer.Write(-1);
+				return;
 			}
+
+			writer.Write(values.Count);
+			for (int i = 0; i < values.Count; i++)
+				writer.Write(values[i]);
+		}	
+		public static IEnumerable<T> WriteMany<T>(this IWriter writer, IReadOnlyList<T> values)
+		{
+			int count = writer.WriteCount(values);
+			for (int i = 0; i < count; i++)
+				yield return values[i];
+		}
+		public static void WriteMany<T>(this IWriter writer, IReadOnlyList<T> values, Action<T> write)
+		{
+			int count = writer.WriteCount(values);
+			for (int i = 0; i < count; i++)
+				write(values[i]);
 		}
 		public static void WriteManyAs<TValue, TResult>(this IWriter writer, 
 			IReadOnlyList<TValue> values, Func<TValue, TResult> converter)
 		{
-			int count = values == null ? -1 : values.Count;
-			writer.Write(count);
+			int count = writer.WriteCount(values);
 			for (int i = 0; i < count; i++)
 			{
 				TResult value = converter(values[i]);
@@ -64,7 +79,7 @@ namespace Utils.Serializers.WritableObjects
 			}
 		}
 
-		public static void WriteArray<T>(this IWriter writer, T[,] values)
+		public static void WriteManyArray<T>(this IWriter writer, T[,] values)
 		{
 			if (values == null)
 			{

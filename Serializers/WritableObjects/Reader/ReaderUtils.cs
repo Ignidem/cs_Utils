@@ -32,22 +32,43 @@ namespace Utils.Serializers.WritableObjects
 			return (T)value;
 		}
 
-		public static T[] ReadMany<T>(this IReader reader)
+		public static T[] ReadNewArray<T>(this IReader reader)
 		{
 			int count = reader.Read<int>();
 			if (count <= -1)
 				return null;
-			else if (count == 0)
+			if (count == 0)
 				return Array.Empty<T>();
 
-			T[] values = new T[count];
-			for (int i = 0; i < count; i++)
+			return new T[count];
+		}
+		public static T[] ReadArray<T>(this IReader reader)
+		{
+			T[] values = reader.ReadNewArray<T>();
+
+			if (values == null) return null;
+			
+			for (int i = 0; i < values.Length; i++)
 			{
 				values[i] = reader.Read<T>();
 			}
 
 			return values;
 		}
+		public static T[] ReadMany<T>(this IReader reader, Func<T> read)
+		{			
+			T[] values = reader.ReadNewArray<T>();
+			
+			if (values == null) return null;
+			
+			for (int i = 0; i < values.Length; i++)
+			{
+				values[i] = read();
+			}
+
+			return values;
+		}
+		
 		public static List<T> ReadList<T>(this IReader reader)
 		{
 			int count = reader.Read<int>();
@@ -78,7 +99,7 @@ namespace Utils.Serializers.WritableObjects
 			return values;
 		}
 
-		public static T[,] ReadArray<T>(this IReader reader)
+		public static T[,] ReadManyArray<T>(this IReader reader)
 		{
 			int x = reader.Read<int>();
 			if (x == -1)

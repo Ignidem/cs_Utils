@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Utilities.Reflection;
+using Utils.Logger;
 
 namespace Utils.Serializers.WritableObjects
 {
@@ -37,6 +39,11 @@ namespace Utils.Serializers.WritableObjects
 		}
 
 		#region T Writable
+		public static void AddWritableSerializer<T>(IHandler<T> handler)
+		{
+			Type type = typeof(T);
+			serializers[type] = handler;
+		}
 		public static IHandler<T> GetWritableSerializer<T>()
 		{
 			Type type = typeof(T);
@@ -45,10 +52,24 @@ namespace Utils.Serializers.WritableObjects
 
 			IHandler<T> serializer = type.IsInterface || type.IsAbstract
 				? new ClassWritableHandler<T, TReader, TWriter>()
-				: new WritableHandler<T, TReader, TWriter>();
+				: CreateWritableHandler<T>();
 
 			serializers[type] = serializer;
 			return serializer;
+		}
+
+		private static IHandler<T> CreateWritableHandler<T>()
+		{
+			Type writableType = typeof(IWritable<>).MakeGenericType(typeof(TWriter));
+			Type valueType = typeof(T);
+			if (!writableType.IsAssignableFrom(valueType))
+				throw new Exception($"{valueType} is not IWritable<{typeof(TWriter).Name}>");
+			
+			if (valueType.IsStruct())
+				LoggerUtils.Logger.Log(Severity.Warning, $"Writable Handler {typeof(TWriter)} should not be used with struct value type {valueType}.");
+
+			Type handlerType = typeof(WritableHandler<,,>).MakeGenericType(typeof(T), typeof(TReader), typeof(TWriter));
+			return (IHandler<T>)Activator.CreateInstance(handlerType);
 		}
 		public static IHandler GetWritableSerializer(Type type)
 		{

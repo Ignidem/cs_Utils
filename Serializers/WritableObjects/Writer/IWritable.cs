@@ -5,7 +5,7 @@
 		void Write(IWriter writer);
 	}
 
-	public interface IWritable<TWriter> : IWritable
+	public interface IWritable<in TWriter> : IWritable
 		where TWriter : IWriter
 	{
 		void IWritable.Write(IWriter writer)

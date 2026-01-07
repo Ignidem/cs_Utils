@@ -22,6 +22,8 @@ namespace Utils.Serializers.WritableObjects.Reader
 			readerFunctions[typeof(T)] = func;
 		}
 
+		public long Position => stream.Position;
+		
 		protected readonly Stream stream;
 		protected readonly BinaryReader reader;
 		private readonly bool disposeStream;
@@ -29,7 +31,6 @@ namespace Utils.Serializers.WritableObjects.Reader
 #if WritableDebugging
 		public StringBuilder DebugContent { get; } = new StringBuilder("Reading Data:\n");
 		public int Indent { get; set; }
-		private bool hasStarted;
 #endif
 		
 		public BinaryStreamReader(byte[] data) : this(new MemoryStream(data), true) { }

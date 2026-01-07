@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Utils.Serializers.WritableObjects.CollectionStreams
 {
 	public struct CollectionReader : ICollectionReader
 	{
+		public long Position => throw new NotImplementedException();
 		public readonly object Current => values[index];
 		private readonly List<object> values;
 
@@ -20,6 +22,7 @@ namespace Utils.Serializers.WritableObjects.CollectionStreams
 			index++;
 			return index < values.Count;
 		}
+
 
 		public T Read<T>()
 		{

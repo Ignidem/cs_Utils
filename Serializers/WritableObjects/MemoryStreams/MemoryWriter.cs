@@ -10,6 +10,7 @@ namespace Utils.Serializers.WritableObjects.MemoryStreams
 	{
 		public long Size => throw new NotImplementedException();
 
+		public long Position => throw new NotImplementedException();
 		public long Capacity => stream.Capacity;
 
 		private readonly System.IO.MemoryStream stream;
@@ -18,6 +19,7 @@ namespace Utils.Serializers.WritableObjects.MemoryStreams
 		{
 			stream = new System.IO.MemoryStream(capacity);
 		}
+
 
 		public T Read<T>()
 		{
