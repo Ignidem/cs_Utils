@@ -87,7 +87,8 @@ namespace Utils.Collections
 			
 			T? old = data[index];
 			data[index] = value;
-			if (old == null) Count--;
+			if (old == null) 
+				Count++;
 			return true;
 		}
 		public virtual T? RemoveAt(int index)
@@ -105,6 +106,8 @@ namespace Utils.Collections
 			{
 				data[i] = default;
 			}
+
+			Count = 0;
 		}
 
 		#region Enumerators
