@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Utils.Results;
 
 namespace Utils.StateMachines
 {
@@ -13,7 +14,7 @@ namespace Utils.StateMachines
 			this.childStateMachine = subStateMachine;
 		}
 
-		public override Task SwitchState(IStateData<T> data)
+		public override Task<Result> SwitchState(IStateData<T> data)
 		{
 			T key = data.Key;
 			return States.TryGetValue(key, out IState<T> state) 
@@ -21,7 +22,7 @@ namespace Utils.StateMachines
 				: childStateMachine.SwitchState(data);
 		}
 
-		public override Task SwitchState(T key)
+		public override Task<Result> SwitchState(T key)
 		{
 			return States.TryGetValue(key, out IState<T> state) 
 				? SwitchState(state, null) 

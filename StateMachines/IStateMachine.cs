@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Utils.Results;
 
 namespace Utils.StateMachines
 {
@@ -31,8 +32,8 @@ namespace Utils.StateMachines
 		event TransitionDelegate OnTransition;
 		bool ContainsState(K key);
 		void AddOrReplaceState(IState<K> state);
-		Task SwitchState(IState<K> state);
-		Task SwitchState(IStateData<K> data);
-		Task SwitchState(K key);
+		Task<Result> SwitchState(IState<K> state);
+		Task<Result> SwitchState(IStateData<K> data);
+		Task<Result> SwitchState(K key);
 	}
 }

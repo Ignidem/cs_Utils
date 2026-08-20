@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Utils.Asyncronous;
 using Utils.Logger;
+using Utils.Results;
 
 namespace Utils.StateMachines
 {
@@ -45,27 +45,32 @@ namespace Utils.StateMachines
 			States[state.Key] = state;
 		}
 
-		public virtual async Task SwitchState(IStateData<K> data)
+		public virtual async Task<Result> SwitchState(IStateData<K> data)
 		{
 			K key = data.Key;
 			if (States.TryGetValue(key, out IState<K> state))
-				await SwitchState(state, data);
+				return await SwitchState(state, data);
+			
+			return "State not found";
 		}
-		public virtual Task SwitchState(IState<K> state)
+		public virtual Task<Result> SwitchState(IState<K> state)
 		{
 			return SwitchState(state, null);
 		}
-		public virtual async Task SwitchState(K key)
+		public virtual async Task<Result> SwitchState(K key)
 		{
 			if (States.TryGetValue(key, out IState<K> state))
-				await SwitchState(state, null);
+				return await SwitchState(state, null);
+			
+			return "State not found";
 		}
 
 		public virtual async Task ExitActiveState()
 		{
+			IState<K> state = ActiveState;
+			
 			try
 			{
-				IState<K> state = ActiveState;
 				if (state == null)
 				{
 					lastTransition = null;
@@ -84,7 +89,8 @@ namespace Utils.StateMachines
 			}
 			catch (Exception e)
 			{
-				OnException(e);
+				OnException?.Invoke(e);
+				throw new TransitionException(state, null, e);
 			}
 		}
 
@@ -102,35 +108,38 @@ namespace Utils.StateMachines
 			OnException?.Invoke(exception);
 			return true;
 		}
-		protected virtual async Task SwitchState(IState<K> state, IStateData<K> data)
+
+		protected virtual async Task<Result> SwitchState(IState<K> state, IStateData<K> data)
 		{
 			if (CheckPendingTransition())
-				return;
+				return "Active Transition";
 
 			if (state == null)
 			{
 				await ExitActiveState();
-				return;
+				return true;
 			}
 
+			IState<K> exitingState = ActiveState;
 			try
 			{
-				IState<K> exitingState = ActiveState;
 				if (state == exitingState)
 				{
 					transitionTask = exitingState.Reload(data);
 					await transitionTask;
-					return;
+					return true;
 				}
 
 				lastTransition = new TransitionInfo<K>(exitingState, state, data);
 				transitionTask = HandleTransition(state, data);
 				await transitionTask;
 				OnStateChange?.Invoke(exitingState, state);
+				return true;
 			}
 			catch (Exception e)
 			{
 				OnException?.Invoke(e);
+				return new TransitionException(exitingState, state, e);
 			}
 		}
 		public TaskAwaiter GetAwaiter() => (transitionTask ?? Task.CompletedTask).GetAwaiter();

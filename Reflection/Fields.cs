@@ -44,5 +44,7 @@ namespace Utilities.Reflection
 		{
 			return info.IsDefined(typeof(CompilerGeneratedAttribute), false);
 		}
+        
+        public static string BackingFieldName(string name) => "<" + name + ">k__BackingField";
     }
 }

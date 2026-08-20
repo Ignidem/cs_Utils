@@ -6,6 +6,7 @@ namespace Utils.Results
 	{
 		public static implicit operator T(BaseLazyResult<T> lazyResult) => lazyResult.Value;
 		public abstract T Value { get; }
+		public Exception Exception { get; protected set; }
 		public string Message => null;
 		public bool HasMessage => false;
 		public bool IsSuccess => Value != null;

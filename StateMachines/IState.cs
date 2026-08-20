@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Utils.Results;
 
 namespace Utils.StateMachines
 {
@@ -101,11 +102,9 @@ namespace Utils.StateMachines
 			}
 		}
 
-		protected Task SwitchState(IStateData<K> data)
+		protected Task<Result> SwitchState(IStateData<K> data)
 		{
-			if (!IsActive) return Task.CompletedTask;
-
-			return StateMachine.SwitchState(data);
+			return IsActive ? StateMachine.SwitchState(data) : Result.Task("Inactive");
 		}
 
 		protected Task SwitchState(K key)

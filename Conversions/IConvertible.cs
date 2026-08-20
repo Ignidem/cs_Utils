@@ -1,6 +1,6 @@
 ﻿namespace Utilities.Conversions
 {
-	public interface IConvertible<T>
+	public interface IConvertible<out T>
 	{
 		T Convert();
 	}
