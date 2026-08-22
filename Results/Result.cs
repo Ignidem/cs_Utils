@@ -18,7 +18,7 @@ namespace Utils.Results
 		public static bool operator false(Result<T> result) => !result.IsSuccess;
 		public static Result<T> operator &(Result<T> left, Result<T> right) => !left ? left : right;
 		public static Result<T> operator &(Result left, Result<T> right) => !left ? left : right;       
-		public static Result operator |(Result<T> left, Result<T> right)
+		public static Result<T> operator |(Result<T> left, Result<T> right)
 		{
 			return ResultUtils.FirstSuccessOrWithContent(left, right);
 		}
