@@ -4,4 +4,9 @@ namespace Utilities.Conversions
 	{
 		T GetValue();
 	}
+
+	public interface IProvider<out T, in P>
+	{
+		T GetValue(P parameter);
+	}
 }
