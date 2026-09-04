@@ -8,6 +8,11 @@ namespace Utilities.Enums
 	{
 		public static T? Random(Random random)
 			=> EnumerationEx.RandomElement<T>(random);
+		
+		public static T[] GetValues()
+		{
+			return (T[])Enum.GetValues(typeof(T));
+		}
 
 		public static implicit operator T(Enum<T> e) => e.Value;
 
